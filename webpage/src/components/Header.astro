@@ -1,0 +1,106 @@
+---
+import { Icon } from "astro-icon/components"
+
+// Main menu items
+const textLinks: { label: string; href: string }[] = [
+    { label: "Home", href: "/" },
+    { label: "CV", href: "/cv/" },
+    // { label: "Work", href: "/work/" },
+    { label: "Blog", href: "/blog/" },
+]
+
+// Social links
+const socialLinks: { label: string; href: string; icon: string }[] = [
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/benjamin-rottler", icon: "linkedin-logo" },
+    { label: "GitHub", href: "https://github.com/QuantumDancer", icon: "github-logo" },
+    { label: "Instagram", href: "https://www.instagram.com/quantumdancer93", icon: "instagram-logo" },
+    { label: "Email", href: "mailto:benjamin@rottler.io", icon: "envelope-simple" },
+]
+
+// UI:
+// - https://daisyui.com/components/navbar/
+// - https://daisyui.com/components/join/
+---
+
+<header>
+    <div class="bg-base-300">
+        <div class="container mx-auto text-center navbar">
+            <div class="navbar-start md:w-auto">
+                <div class="dropdown">
+                    <div tabindex="0" role="button" class="btn btn-ghost md:hidden">
+                        <Icon name="list" class="h-5 w-5" />
+                    </div>
+                    <ul
+                        tabindex="0"
+                        class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+                    >
+                        {
+                            textLinks.map(({ label, href }) => (
+                                <li>
+                                    <a href={href}>{label}</a>
+                                </li>
+                            ))
+                        }
+                        <li class="sm:hidden">
+                            <a>Contact</a>
+                            <ul class="p-2">
+                                {
+                                    socialLinks.map(({ label, href, icon }) => (
+                                        <li>
+                                            <a href={href}>
+                                                <Icon name={icon} width={16} height={16} />
+                                                {label}
+                                            </a>
+                                        </li>
+                                    ))
+                                }
+                            </ul>
+                        </li>
+                        <li class="sm:hidden">
+                            <label class="flex cursor-pointer gap-2" data-choose-theme-overflow>
+                                <Icon name="sun" width={16} height={16} class="swap-on fill-current" />
+                                <input type="checkbox" value="darkmode" class="toggle theme-controller" />
+                                <Icon name="moon" width={16} height={16} class="swap-off fill-current" />
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <a class="btn btn-ghost text-xl">
+                    <Icon name="terminal" class="mr-2 hidden md:block" />
+                     Benjamin Rottler
+                </a>
+            </div>
+            <div class="navbar-center md:grow hidden md:flex justify-center">
+                <ul class="menu menu-horizontal px-1">
+                    {
+                        textLinks.map(({ label, href }) => (
+                            <li>
+                                <a href={href}>{label}</a>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+            <div class="navbar-end hidden sm:flex md:w-auto">
+                <div class="join">
+                    {
+                        socialLinks.map(({ label, href, icon }) => (
+                            <a href={href}>
+                                <button class="btn join-item" title={label}>
+                                    <Icon name={icon} width={16} height={16} />
+                                </button>
+                            </a>
+                        ))
+                    }
+                </div>
+                <label class="btn btn-square swap swap-rotate ml-4 mr-1" data-choose-theme>
+                    <!-- this hidden checkbox controls the state -->
+                    <input type="checkbox" class="theme-controller" value="dark" />
+
+                    <Icon name="sun" width={16} height={16} class="swap-on fill-current" />
+                    <Icon name="moon" width={16} height={16} class="swap-off fill-current" />
+                </label>
+            </div>
+        </div>
+    </div>
+</header>

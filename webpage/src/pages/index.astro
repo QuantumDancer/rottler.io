@@ -1,16 +1,27 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro"
 
+import { Image } from "astro:assets"
+import portrait from "../media/portrait_square.jpg"
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+    <div class="hero bg-base-200">
+        <div class="hero-content flex-col lg:flex-row-reverse">
+            <Image
+                src={portrait}
+                width="320"
+                height="320"
+                alt="Benjamin Rottler"
+                class="max-w-sm rounded-3xl shadow-2xl"
+            />
+            <div>
+                <h1 class="text-5xl font-bold">Welcome!</h1>
+                <p class="py-6">
+                    I'm a linux system administrator and software developer for high energy physics computing.
+                </p>
+                <button class="btn btn-primary">Get Started</button>
+            </div>
+        </div>
+    </div>
+</BaseLayout>

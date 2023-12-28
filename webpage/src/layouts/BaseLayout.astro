@@ -1,0 +1,36 @@
+---
+import { ViewTransitions } from "astro:transitions"
+
+import SetTheme from "../components/ThemeToggle.astro"
+import Header from "../components/Header.astro"
+import Footer from "../components/Footer.astro"
+
+interface Props {
+    title?: string | undefined
+    description?: string | undefined
+}
+
+const { title = "Benjamin Rottler", description = "The personal site of Benjamin Rottler" } = Astro.props
+---
+
+<html lang="en">
+    <head>
+        <SetTheme lightColor="light" darkColor="dark" />
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="generator" content={Astro.generator} />
+        <meta name="description" property="og:description" content={description} />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <title>{title}</title>
+        <ViewTransitions />
+    </head>
+    <body>
+        <div class="flex min-h-screen flex-col overflow-x-hidden bg-base-100">
+            <Header />
+            <div class="flex-1 mx-auto container px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+                <slot />
+            </div>
+            <Footer />
+        </div>
+    </body>
+</html>

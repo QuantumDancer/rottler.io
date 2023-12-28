@@ -1,0 +1,104 @@
+---
+
+---
+
+<script is:inline>
+    // This script is inline to apply styles as early as possible
+    // to avoid a flash of unthemed content
+
+    // Loads theme from local storage and applies to document
+    const setTheme = () => {
+        let theme = localStorage.getItem("theme")
+        if (!theme) {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+            localStorage.setItem("theme", theme)
+        }
+
+        document.documentElement.setAttribute("data-theme", theme)
+    }
+    // Runs on initial navigation
+    setTheme()
+
+    // Runs on view transitions navigation
+    document.addEventListener("astro:after-swap", setTheme)
+</script>
+
+<script>
+    // This script is not inline, so it will be loaded after the page is rendered
+
+    // Loads theme from local storage and applies to document
+    const setTheme = () => {
+        const theme = localStorage.getItem("theme")
+
+        if (theme) {
+            document.documentElement.setAttribute("data-theme", theme)
+        } else {
+            document.documentElement.removeAttribute("data-theme")
+        }
+    }
+
+    // make sure that state of theme toggle matches current theme
+    const syncTheme = (theme: string, overflow: boolean) => {
+        const themeLabel = document.querySelector(overflow ? "[data-choose-theme-overflow]" : "[data-choose-theme]")
+        const themeCheckbox = themeLabel?.querySelector(".theme-controller")
+        if (themeCheckbox instanceof HTMLInputElement) {
+            // dark mode corresponds to checked
+            themeCheckbox.checked = theme === "dark"
+        }
+    }
+
+    const toggleTheme = () => {
+        const currentTheme = localStorage.getItem("theme")
+        const newTheme = currentTheme === "dark" ? "light" : "dark"
+        localStorage.setItem("theme", newTheme)
+        setTheme()
+        // sync theme toggle in overflow menu
+        syncTheme(newTheme, true)
+    }
+
+    const toggleThemeOverflow = () => {
+        const currentTheme = localStorage.getItem("theme")
+        const newTheme = currentTheme === "dark" ? "light" : "dark"
+        localStorage.setItem("theme", newTheme)
+        setTheme()
+        // sync theme toggle in main menu
+        syncTheme(newTheme, false)
+    }
+
+    const setupThemeSwitcher = () => {
+        // get theme from local storage or default to system preference
+        let theme = localStorage.getItem("theme")
+        if (!theme) {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+            localStorage.setItem("theme", theme)
+        }
+
+        // sync theme toggles to current theme for both main menu and overflow menu
+        syncTheme(theme, true)
+        syncTheme(theme, false)
+
+        // add event listener to theme toggle for main menu
+        ;[...document.querySelectorAll("label[data-choose-theme]")].forEach((el) => {
+            if (el instanceof HTMLLabelElement) {
+                el.addEventListener("change", function () {
+                    toggleTheme()
+                })
+            }
+        })
+
+        // add event listener to theme toggle for overflow menu
+        ;[...document.querySelectorAll("label[data-choose-theme-overflow]")].forEach((el) => {
+            if (el instanceof HTMLLabelElement) {
+                el.addEventListener("change", function () {
+                    toggleThemeOverflow()
+                })
+            }
+        })
+    }
+
+    // Runs on initial navigation
+    setupThemeSwitcher()
+
+    // Runs on view transitions navigation
+    document.addEventListener("astro:after-swap", setupThemeSwitcher)
+</script>
