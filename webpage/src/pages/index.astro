@@ -6,21 +6,37 @@ import portrait from "../media/portrait_square.jpg"
 ---
 
 <BaseLayout>
-    <div class="hero bg-base-200">
+    <div class="hero">
         <div class="hero-content flex-col lg:flex-row-reverse">
-            <Image
-                src={portrait}
-                width="320"
-                height="320"
-                alt="Benjamin Rottler"
-                class="max-w-sm rounded-3xl shadow-2xl"
-            />
-            <div>
-                <h1 class="text-5xl font-bold">Welcome!</h1>
-                <p class="py-6">
-                    I'm a linux system administrator and software developer for high energy physics computing.
+            <div class="mb-6 lg:my-0 lg:ml-10">
+                <Image
+                    src={portrait}
+                    width="320"
+                    height="320"
+                    alt="Benjamin Rottler"
+                    class="max-w-sm rounded-3xl shadow-2xl"
+                />
+            </div>
+            <div class="max-w-prose text-lg sm:text-xl">
+                <h1 class="text-3xl sm:text-5xl font-bold">Welcome!</h1>
+                <p class="mt-4 py-2 text-justify hyphens-auto">
+                    I'm a Linux system administrator and software developer for high energy-physics computing. My
+                    background is in experimental particle physics, where I obtained my PhD in 2023.
                 </p>
-                <button class="btn btn-primary">Get Started</button>
+                <p class="py-2 text-justify hyphens-auto">
+                    I've built this website as part of the <a
+                        class="link link-accent"
+                        href="https://cloudresumechallenge.dev/docs/the-challenge/aws/">Cloud Resume Challenge</a
+                    >. It is automatically deployed to AWS in a CI/CD pipeline using GitHub Actions and Terraform. The
+                    static content is hosted on S3 and delivered via CloudFront. You can read more about this in my blog
+                    or check out the code on GitHub.
+                </p>
+                <div class="mt-6 flex justify-around">
+                    <a href="/blog"><button class="btn btn-primary min-w-24">Blog</button></a>
+                    <a href="https://github.com/QuantumDancer/rottler.io/"
+                        ><button class="btn btn-primary min-w-24">GitHub</button></a
+                    >
+                </div>
             </div>
         </div>
     </div>
