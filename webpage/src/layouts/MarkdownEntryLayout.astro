@@ -1,6 +1,7 @@
 ---
+import { Icon } from "astro-icon/components"
 import BaseLayout from "./BaseLayout.astro"
-const { frontmatter } = Astro.props
+const { frontmatter, previous, next } = Astro.props
 ---
 
 <BaseLayout title={` ${frontmatter.title} | Benjamin Rottler`}>
@@ -9,6 +10,38 @@ const { frontmatter } = Astro.props
             <h1 class="text-center">{frontmatter.title}</h1>
             <p class="text-right">Published: {frontmatter.publishDate.toISOString().split("T")[0]}</p>
             <slot />
+            <div class="flex flex-col-reverse text-center lg:flex-row lg:justify-between gap-4">
+                <div>
+                    {
+                        previous && (
+                            <a href={`/blog/${previous.slug}/`} class="btn btn-sm md:btn-md gap-2 lg:gap-3">
+                                <Icon name="caret-left" class="h-6 w-6 fill-current md:h-8 md:w-8" />
+                                <div class="flex flex-col items-start">
+                                    <span class="text-base-content/50 hidden text-xs font-normal md:block">
+                                        Previous
+                                    </span>
+                                    <span>{previous.data.title}</span>
+                                </div>
+                            </a>
+                        )
+                    }
+                </div>
+                <div>
+                    {
+                        next && (
+                            <a href={`/blog/${next.slug}/`} class="btn btn-neutral btn-sm md:btn-md gap-2 lg:gap-3">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-neutral-content/50 hidden text-xs font-normal md:block">
+                                        Next
+                                    </span>
+                                    <span>{next.data.title}</span>
+                                </div>
+                                <Icon name="caret-right" class="h-6 w-6 fill-current md:h-8 md:w-8" />
+                            </a>
+                        )
+                    }
+                </div>
+            </div>
         </article>
     </div>
 </BaseLayout>
