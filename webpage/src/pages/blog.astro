@@ -1,9 +1,36 @@
 ---
+import { getCollection } from "astro:content"
+
 import BaseLayout from "../layouts/BaseLayout.astro"
+
+const allBlogPosts = await getCollection("blog")
 ---
 
 <BaseLayout title="Blog | Benjamin Rottler">
-    <div>
-        <p>Under construction</p>
+    <h1 class="text-3xl sm:text-5xl font-bold mb-12">Blog</h1>
+
+    <div class="grid gap-4 md:auto-rows-fr md:grid-cols-2 md:gap-8">
+        {
+            allBlogPosts
+                .sort((a, b) => {
+                    return a.id > b.id ? 1 : -1
+                })
+                .reverse()
+                .map((post) => (
+                    <a href={`/blog/${post.slug}/`}>
+                        <div class="card bg-base-100 shadow-xl h-full">
+                            <div class="card-body">
+                                <h2 class="card-title">{post.data.title}</h2>
+                                <p>{post.data.description}</p>
+                                <div class="card-actions justify-end">
+                                    {post.data.tags.map((tag) => (
+                                        <div class="badge badge-outline">{tag}</div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                ))
+        }
     </div>
 </BaseLayout>

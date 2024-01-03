@@ -1,0 +1,14 @@
+---
+import BaseLayout from "./BaseLayout.astro"
+const { frontmatter } = Astro.props
+---
+
+<BaseLayout title={` ${frontmatter.title} | Benjamin Rottler`}>
+    <div class="flex justify-center">
+        <article class="prose lg:prose-xl text-justify hyphens-auto">
+            <h1 class="text-center">{frontmatter.title}</h1>
+            <p class="text-right">Published: {frontmatter.publishDate.toISOString().split("T")[0]}</p>
+            <slot />
+        </article>
+    </div>
+</BaseLayout>
