@@ -6,7 +6,7 @@ variable "role_arn" {
 variable "project_name" {
   description = "A project name to be used in resources"
   type        = string
-  default     = "rottler.io"
+  default     = "rottler-io"
 }
 
 variable "environment" {
@@ -18,6 +18,12 @@ variable "environment" {
   }
 }
 
+variable "top_level_domain" {
+  description = "The top level domain for the website"
+  type        = string
+  default     = "rottler.io"
+}
+
 locals {
-  domain_name = "${var.environment == "dev" ? "dev." : ""}${var.project_name}"
+  domain_name = "${var.environment}.${var.top_level_domain}"
 }
