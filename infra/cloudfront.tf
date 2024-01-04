@@ -17,11 +17,11 @@ resource "aws_cloudfront_distribution" "website" {
   comment             = "S3 bucket for ${local.domain_name}"
   default_root_object = "index.html"
 
-  # logging_config {
-  #   include_cookies = false
-  #   bucket          = aws_s3_bucket.logs.bucket_domain_name
-  #   prefix          = "${local.domain_name}/"
-  # }
+  logging_config {
+    include_cookies = false
+    bucket          = aws_s3_bucket.logs.bucket_domain_name
+    prefix          = "cloudfront/${local.domain_name}/"
+  }
 
   aliases = ["${local.domain_name}"]
 
@@ -42,9 +42,9 @@ resource "aws_cloudfront_distribution" "website" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate.website_cert.arn
+    acm_certificate_arn      = aws_acm_certificate.website_cert.arn
     minimum_protocol_version = "TLSv1.2_2021"
-    ssl_support_method  = "sni-only"
+    ssl_support_method       = "sni-only"
   }
 
 }

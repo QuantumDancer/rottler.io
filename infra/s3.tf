@@ -1,3 +1,7 @@
+##################
+# Website bucket #
+##################
+
 resource "random_id" "website_bucket_id" {
   byte_length = 4
 }
@@ -37,6 +41,10 @@ data "aws_iam_policy_document" "allow_access_from_cloudfront" {
   }
 }
 
+##################
+# Logs bucket    #
+##################
+
 resource "random_id" "logging_bucket_id" {
   byte_length = 4
 }
@@ -60,3 +68,36 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "logs" {
+  bucket = aws_s3_bucket.logs.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "logs" {
+  depends_on = [aws_s3_bucket_ownership_controls.logs]
+
+  bucket = aws_s3_bucket.logs.id
+  acl    = "log-delivery-write"
+}
+
+data "aws_iam_policy_document" "logs_bucket_policy" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["${data.aws_caller_identity.current.account_id}"]
+    }
+    actions = [
+      "s3:GetBucketAcl",
+      "s3:PutBucketAcl"
+    ]
+    resources = [aws_s3_bucket.logs.arn]
+  }
+}
+
+resource "aws_s3_bucket_policy" "logs_bucket_policy" {
+  bucket = aws_s3_bucket.logs.id
+  policy = data.aws_iam_policy_document.logs_bucket_policy.json
+}
