@@ -20,4 +20,18 @@ To align the challenge with my preferences, I've reorganized and consolidated th
 
 I will delve into the specifics of each step in individual blog posts.
 
-Let's get coding!
+For now, let's just do some general setup.
+I've decided that I won't store the different components (frontend, backend, infrastructure) in separate repositories.
+So I've created a [GitHub repository](https://github.com/QuantumDancer/rottler.io) where I will store all my code.
+I will put each component into its own directory structure. So right now, the repository looks like this on my local machine:
+
+```
+$ tree .
+.
+├── backend-counter
+├── infra
+└── webpage
+```
+
+That's all for now.
+Next, I'm going to build the frontend, including this blog.
