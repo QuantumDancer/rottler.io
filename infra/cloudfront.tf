@@ -26,11 +26,16 @@ resource "aws_cloudfront_distribution" "website" {
   aliases = ["${local.domain_name}"]
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.cf_website_s3_origin_id
-    cache_policy_id  = aws_cloudfront_cache_policy.website.id
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = local.cf_website_s3_origin_id
+    cache_policy_id        = aws_cloudfront_cache_policy.website.id
     viewer_protocol_policy = "redirect-to-https"
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.append_index_html.arn
+    }
   }
 
   price_class = "PriceClass_100"
@@ -74,4 +79,11 @@ resource "aws_cloudfront_origin_access_control" "website" {
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
+}
+
+resource "aws_cloudfront_function" "append_index_html" {
+  name    = "append_index_html"
+  runtime = "cloudfront-js-2.0"
+  comment = "Append index.html when it's missing from the URL"
+  code    = file("${path.module}/scripts/cloudfront_append_index_html.js")
 }
