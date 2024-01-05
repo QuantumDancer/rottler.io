@@ -1,0 +1,19 @@
+name: "Deploy the Astro webpage"
+description: "Combining npm clean-install && build actions into one"
+
+runs:
+  using: "composite"
+  
+  steps:
+    - name: Upload to S3
+      working-directory: webpage
+      run: |
+        bucket_id=$(terraform -chdir=../infra output -raw website_bucket_id)
+        aws s3 sync --delete ./dist/ "s3://$bucket_id"
+      shell: bash
+    - name: Invalidate CloudFront distribution
+      working-directory: webpage
+      run: |
+        cloudfront_distribution_id=$(terraform -chdir=../infra output -raw cloudfront_distribution_id)
+        aws cloudfront create-invalidation --distribution-id "$cloudfront_distribution_id" --paths "/*"
+      shell: bash

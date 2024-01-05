@@ -1,0 +1,25 @@
+name: "Plan and Apply Terraform code"
+description: "Combining plan && apply actions into one"
+inputs:
+  environment:
+    type: string
+    required: true
+  region:
+    type: string
+    required: true
+  iam-role:
+    type: string
+    required: true
+runs:
+  using: "composite"
+  
+  steps:
+    - uses: hashicorp/setup-terraform@v3
+    - name: Terraform plan
+      run: terraform plan -var="environment=${{ inputs.environment }}"
+      shell: bash
+      working-directory: infra
+    - name: Terraform apply
+      run: terraform apply -auto-approve -var="environment=${{ inputs.environment }}"
+      shell: bash
+      working-directory: infra

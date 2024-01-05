@@ -1,0 +1,14 @@
+name: "Build the Astro webpage"
+description: "Combining npm clean-install && build actions into one"
+runs:
+  using: "composite"
+  
+  steps:
+      - name: 'Setup: Install NPM modules'
+        working-directory: webpage
+        run: npm ci
+        shell: bash
+      - name: 'Build: Webpage'
+        working-directory: webpage
+        run: npm run build
+        shell: bash

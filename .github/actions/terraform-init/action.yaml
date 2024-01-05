@@ -1,0 +1,30 @@
+name: "AWS Login and Terraform Init"
+description: "Combining AWS Login && terraform init actions into one"
+
+inputs:
+  environment:
+    type: string
+    required: true
+  region:
+    type: string
+    required: true
+  iam-role:
+    type: string
+    required: true
+
+runs:
+  using: "composite"
+  
+  steps:
+    - uses: hashicorp/setup-terraform@v3
+    - name: "Setup: Configure AWS credentials"
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.iam-role }}
+        role-session-name: github-actions-terraform
+        role-duration-seconds: 3600
+        aws-region: ${{ inputs.region }}
+    - name: Terraform Init
+      run: terraform init -backend-config=backend.${{ inputs.environment }}.hcl
+      shell: bash
+      working-directory: infra
