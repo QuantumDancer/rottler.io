@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "logs_bucket_policy" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["${data.aws_caller_identity.current.account_id}"]
+      identifiers = [data.aws_caller_identity.current.account_id]
     }
     actions = [
       "s3:GetBucketAcl",
