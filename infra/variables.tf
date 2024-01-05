@@ -26,4 +26,7 @@ variable "top_level_domain" {
 
 locals {
   domain_name = "${var.environment}.${var.top_level_domain}"
+  # dev:  dev.rottler.io
+  # prod: prod.rottler.io, www.rottler.io, rottler.io
+  cloudfront_aliases = var.environment == "prod" ? [var.top_level_domain, "www.${var.top_level_domain}", "${var.environment}.${var.top_level_domain}"] : ["${var.environment}.${var.top_level_domain}"]
 }

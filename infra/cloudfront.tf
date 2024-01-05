@@ -23,7 +23,7 @@ resource "aws_cloudfront_distribution" "website" {
     prefix          = "cloudfront/${local.domain_name}/"
   }
 
-  aliases = [local.domain_name]
+  aliases = local.cloudfront_aliases
 
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
