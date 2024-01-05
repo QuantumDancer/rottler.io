@@ -1,0 +1,64 @@
+name: Deploy Prod environment
+
+concurrency:
+  group: deploy-${{ vars.ENVIRONMENT }}
+  cancel-in-progress: false
+
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - prod
+
+permissions:
+  id-token: write # This is required for requesting the JWT (AWS)
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  deploy-infra-to-prod:
+    environment: prod
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v4
+      - name: 'Setup: AWS Login and Terraform init'
+        uses: ./.github/actions/terraform-init
+        with:
+          environment: ${{ vars.ENVIRONMENT }}
+          region: ${{ vars.AWS_REGION }}
+          iam-role: ${{ secrets.TF_AWS_ROLE }}
+      - name: 'Test: check and validate'
+        uses: ./.github/actions/terraform-test
+        with:
+          environment: ${{ vars.ENVIRONMENT }}
+          region: ${{ vars.AWS_REGION }}
+          iam-role: ${{ secrets.TF_AWS_ROLE }}
+      - name: 'Deploy: Infra to ${{ vars.ENVIRONMENT }}'
+        uses: ./.github/actions/terraform-apply
+        with:
+          environment: ${{ vars.ENVIRONMENT }}
+          region: ${{ vars.AWS_REGION }}
+          iam-role: ${{ secrets.TF_AWS_ROLE }}
+
+  deploy-website-to-prod:
+    environment: prod
+    runs-on: ubuntu-latest
+    needs: deploy-infra-to-prod
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Setup: AWS Login and Terraform init'
+        uses: ./.github/actions/terraform-init
+        with:
+          environment: ${{ vars.ENVIRONMENT }}
+          region: ${{ vars.AWS_REGION }}
+          iam-role: ${{ secrets.TF_AWS_ROLE }}
+      - name: 'Setup: Refresh terraform state'
+        run: terraform refresh -var="environment=${{ vars.environment }}"
+        shell: bash
+        working-directory: infra
+      - name: 'Setup: Install NPM modules'
+        working-directory: webpage
+        run: npm ci
+      - name: 'Build: Webpage'
+        uses: ./.github/actions/astro-build
+      - name: 'Deploy: Webpage to ${{ vars.ENVIRONMENT }}'
+        uses: ./.github/actions/astro-deploy
