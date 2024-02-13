@@ -10,70 +10,170 @@ import BaseLayout from "../layouts/BaseLayout.astro"
                 <h3 class="text-lg font-semibold base-content">Doctoral / postdoctoral researcher (Wissenschaftlicher Mitarbeiter)</h3>
                 <p class="text-sm base-content">Physikalisches Institut, Universtität Freiburg | Feb 2018 - present</p>
                 <div class="mt-4 space-y-2">
-                    <h4 class="text-md font-semibold base-content">Administration of a computing cluster for elementary particle physics (June 2019 - present)</h4>
-                    <p class="text-sm base-content text-justify">
-                        The <a href="https://www.hpc.uni-freiburg.de/atlas-bfg" class="link link-info">ATLAS-BFG cluster</a>
-                        is a high-throughput cluster (HTC) that allows users from local particle physics research groups and global members of the ATLAS collaboration to analyse collision data from the <a
-                            href="https://atlas.cern/"
-                            class="link link-info"
-                        >
-                            ATLAS experiment
-                        </a>. The core of the cluster is a batch system with 3400 CPU cores and a distributed object storage system with 4 PB of storage space. The cluster is part of the World Wide LHC Computing Grid (WLCG).
-                    </p>
-                    <ul class="list-disc list-inside text-sm base-content">
-                        <li>Integration of new and existing services into the cluster's IaC solution</li>
-                        <li>Maintanence and further development of the cluster's monitoring infrastructure</li>
-                        <li>Creating images for the worker and login nodes of the cluster</li>
-                        <li>Operating the services that integrate resources from the HPC cluster NEMO into the ATLAS-BFG cluster</li>
-                        <li>Support for local users</li>
-                    </ul>
-                    <p class="text-sm base-content">Technologies used: Puppet, Packer, Docker, Prometheus, Grafana, Nagios, Slurm, CentOS 7, Alma 9</p>
-                    <h4 class="text-md font-semibold base-content">Framework for the accounting of shared and opportunistic resources (April 2023 - present)</h4>
-                    <p class="text-sm base-content text-justify">
-                        <a href="https://alu-schumacher.github.io/AUDITOR/latest/" class="link link-info">AUDITOR</a> (AccoUnting DatahandlIng Toolbox for Opportunistic Resources) is a flexible and extensible framework for the accounting of
-                        shared and opportunistic resources.
-                    </p>
-                    <ul class="list-disc list-inside text-sm base-content">
-                        <li>Planing of new features and technical management of contributing developers</li>
-                        <li>Release management: Publishing new releases, communication with users</li>
-                        <li>Operation of multiple AUDITOR instances within the ATLAS-BFG cluster</li>
-                    </ul>
-                    <p class="text-sm base-content">Technologies used: Rust, Python, PostgreSQL, Docker, GitHub Actions</p>
-                    <h4 class="text-md font-semibold base-content">Monitoring of WLCG grid sites (Jan 2022 - present)</h4>
-                    <p class="text-sm base-content">
-                        <a href="http://hammercloud.cern.ch" class="link link-info">HammerCloud</a> is a monitoring and testing framework, that is developed and used by the ATLAS collaboration to monitor the availability and performance of the
-                        global grid infrastructure of the WLCG.
-                    </p>
-                    <ul class="list-disc list-inside text-sm base-content">
-                        <li>Migrating from Python 2/Django 1 to Python 3/Django 4</li>
-                        <li>Migration to CERN's new OIDC-based single sign-on solution</li>
-                        <li>Redesigning the architecture into a container-based setup</li>
-                        <li>Redesign of the architecture to a container-based setup</li>
-                    </ul>
-                    <p class="text-sm base-content">Technologies used: Python, Django, Docker, Docker Compose</p>
-                    <h4 class="text-md font-semibold base-content">PhD Thesis: Search for Higgs‑Boson Pair‑Production in the bbll+ETMiss final state with the ATLAS detector at &Sqrt;s = 13 TeV (Feb 2018 - May 2023)</h4>
-                    <ul class="list-disc list-inside text-sm base-content">
-                        <li>Measurement of the cross section and signal strength of non-resonant Higgs-boson pair-production</li>
-                        <li>Measurement of the trillinear Higgs-boson self-coupling</li>
-                        <li>Analysis of ~100TB of data</li>
-                        <li>Improving the event selection with neural networks</li>
-                        <li>Statistical analysis (confidence intervals, hypothesis testing)</li>
-                        <li>Improved sensitivity by a factor of three compared to previous analysis</li>
-                        <li>Six-month research stay at CERN</li>
-                    </ul>
-                    <p class="text-sm base-content">Technologies used: Python, Django, Docker, Docker Compose</p>
-                    <h4 class="text-md font-semibold base-content">Teaching duties (Apr 2018 - present)</h4>
-                    <ul class="list-disc list-inside text-sm base-content">
-                        <li>Correction of weekly exercises and final exams</li>
-                        <li>Discussion of the exercises with the students in weekly tutorials</li>
-                    </ul>
+                    <div class="p-4 base-100 rounded shadow">
+                        <h4 class="text-md font-semibold base-content">Administration of a computing cluster for elementary particle physics (June 2019 - present)</h4>
+                        <p class="text-sm base-content text-justify">
+                            The <a href="https://www.hpc.uni-freiburg.de/atlas-bfg" class="link link-info">ATLAS-BFG cluster</a>
+                            is a high-throughput cluster (HTC) that allows users from local particle physics research groups and global members of the ATLAS collaboration to analyse collision data from the <a
+                                href="https://atlas.cern/"
+                                class="link link-info"
+                            >
+                                ATLAS experiment
+                            </a>. The core of the cluster is a batch system with 3400 CPU cores and a distributed object storage system with 4 PB of storage space. The cluster is part of the World Wide LHC Computing Grid (WLCG).
+                        </p>
+                        <ul class="list-disc list-inside text-sm base-content">
+                            <li>Integration of new and existing services into the cluster's IaC solution</li>
+                            <li>Maintenance and further development of the cluster's monitoring infrastructure</li>
+                            <li>Creating images for the worker and login nodes of the cluster</li>
+                            <li>Operating the services that integrate resources from the HPC cluster NEMO into the ATLAS-BFG cluster</li>
+                            <li>Support for local users</li>
+                        </ul>
+                        <p class="text-sm base-content">Technologies used: Puppet, Packer, Docker, Prometheus, Grafana, Nagios, Slurm, CentOS 7, Alma 9</p>
+                    </div>
+
+                    <div class="p-4 base-100 rounded shadow">
+                        <h4 class="text-md font-semibold base-content">Framework for the accounting of shared and opportunistic resources (April 2023 - present)</h4>
+                        <p class="text-sm base-content text-justify">
+                            <a href="https://alu-schumacher.github.io/AUDITOR/latest/" class="link link-info">AUDITOR</a> (AccoUnting DatahandlIng Toolbox for Opportunistic Resources) is a flexible and extensible framework for the accounting
+                            of shared and opportunistic resources.
+                        </p>
+                        <ul class="list-disc list-inside text-sm base-content">
+                            <li>Planing of new features and technical management of contributing developers</li>
+                            <li>Release management: Publishing new releases, communication with users</li>
+                            <li>Operation of multiple AUDITOR instances within the ATLAS-BFG cluster</li>
+                        </ul>
+                        <p class="text-sm base-content">Technologies used: Rust, Python, PostgreSQL, Docker, GitHub Actions</p>
+                    </div>
+
+                    <div class="p-4 base-100 rounded shadow">
+                        <h4 class="text-md font-semibold base-content">Monitoring of WLCG grid sites (Jan 2022 - present)</h4>
+                        <p class="text-sm base-content">
+                            <a href="http://hammercloud.cern.ch" class="link link-info">HammerCloud</a> is a monitoring and testing framework, that is developed and used by the ATLAS collaboration to monitor the availability and performance
+                            of the global grid infrastructure of the WLCG.
+                        </p>
+                        <ul class="list-disc list-inside text-sm base-content">
+                            <li>Migrating from Python 2/Django 1 to Python 3/Django 4</li>
+                            <li>Migration to CERN's new OIDC-based single sign-on solution</li>
+                            <li>Redesigning the architecture into a container-based setup</li>
+                            <li>Redesign of the architecture to a container-based setup</li>
+                        </ul>
+                        <p class="text-sm base-content">Technologies used: Python, Django, Docker, Docker Compose</p>
+                    </div>
+
+                    <div class="p-4 base-100 rounded shadow">
+                        <h4 class="text-md font-semibold base-content">PhD Thesis: Search for Higgs‑Boson Pair‑Production in the bbll+ETMiss final state with the ATLAS detector at &Sqrt;s = 13 TeV (Feb 2018 - May 2023)</h4>
+                        <ul class="list-disc list-inside text-sm base-content">
+                            <li>Measurement of the cross section and signal strength of non-resonant Higgs-boson pair-production</li>
+                            <li>Measurement of the trillinear Higgs-boson self-coupling</li>
+                            <li>Analysis of ~100TB of data</li>
+                            <li>Improving the event selection with neural networks</li>
+                            <li>Statistical analysis (confidence intervals, hypothesis testing)</li>
+                            <li>Improved sensitivity by a factor of three compared to previous analysis</li>
+                            <li>Six-month research stay at CERN</li>
+                        </ul>
+                        <p class="text-sm base-content">Technologies used: Python, Django, Docker, Docker Compose</p>
+                    </div>
+
+                    <div class="p-4 base-100 rounded shadow">
+                        <h4 class="text-md font-semibold base-content">Teaching duties (Apr 2018 - present)</h4>
+                        <ul class="list-disc list-inside text-sm base-content">
+                            <li>Correction of weekly exercises and final exams</li>
+                            <li>Discussion of the exercises with the students in weekly tutorials</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="p-4 rounded shadow base-content">
-            <h3 class="text-lg font-semibold base-content">Research assistant (Wissenschaftliche Hilfskraft / HiWi)</h3>
-            <p class="text-sm neutral-content">Physikalisches Institut, Universtität Freiburg | Mar 2017 - Dec 2017</p>
-            <p class="mt-2 base-content">Assisting the administrators of the ATLAS-BFG cluster</p>
+        <div class="mt-4 space-y-4">
+            <div class="p-4 rounded shadow base-content">
+                <h3 class="text-lg font-semibold base-content">Research assistant (Wissenschaftliche Hilfskraft / HiWi)</h3>
+                <p class="text-sm neutral-content">Physikalisches Institut, Universtität Freiburg | Mar 2017 - Dec 2017</p>
+                <p class="mt-2 base-content">Assisting the administrators of the ATLAS-BFG cluster</p>
+            </div>
+        </div>
+    </section>
+    <section class="mb-6">
+        <h2 class="text-2xl font-semibold">Publications and presentations</h2>
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">Fair sharing of resources between clusters with AUDITOR</h3>
+                <p class="text-sm base-content">Presentation | 9th bwHPC Symposium | October 2023 | Mannheim, DE</p>
+                <ul class="list-disc list-inside text-sm base-content">
+                    <li>Slides: <a href="https://indico.scc.kit.edu/event/3635/contributions/14547/" class="link link-info">https://indico.scc.kit.edu/event/3635/contributions/14547/</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">Bringing the ATLAS HammerCloud setup to the next level with containerization</h3>
+                <p class="text-sm base-content">Conference talk | 26th International Conference On Computing In High Energy & Nuclear Physics (CHEP) | May 2023 | Norfolk, VA, USA</p>
+                <ul class="list-disc list-inside text-sm base-content">
+                    <li>Slides: <a href="https://indico.jlab.org/event/459/contributions/11486/" class="link link-info">https://indico.jlab.org/event/459/contributions/11486/</a></li>
+                    <li>Proceedings: <a href="https://cds.cern.ch/record/2871988" class="link link-info">https://cds.cern.ch/record/2871988</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">Opportunistic extension of a local compute cluster with NEMO resources for HEP workflows</h3>
+                <p class="text-sm base-content">Presentation | 14th Annual meeting of the Helmholtz Alliance "Physics at the terascale" | November 2021 | DESY Hamburg, DE (online)</p>
+                <ul class="list-disc list-inside text-sm base-content">
+                    <li>Slides: <a href="https://indico.desy.de/event/31325/contributions/112490/" class="link link-info">https://indico.desy.de/event/31325/contributions/112490/</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">Search for Higgs‑Boson Pair‑Production in the bbll+ETMiss final state with the ATLAS detector at &Sqrt;s = 13 TeV</h3>
+                <p class="text-sm base-content">PhD thesis | May 2023 | Freiburg, DE</p>
+                <ul class="list-disc list-inside text-sm base-content">
+                    <li>Publication: <a href="https://freidok.uni-freiburg.de/data/238604" class="link link-info">https://freidok.uni-freiburg.de/data/238604</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">Search for non‑resonant Higgs boson pair production in the 2b+2l+ETMiss final state in pp collisions at &Sqrt;s = 13 TeV with the ATLAS detector</h3>
+                <p class="text-sm base-content">Publication | October 2023 | CERN</p>
+                <ul class="list-disc list-inside text-sm base-content">
+                    <li>Preprint: <a href="https://arxiv.org/abs/2310.11286" class="link link-info">arXiv:2310.11286</a></li>
+                    <li>Accepted by JHEP</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    <section class="mb-6">
+        <h2 class="text-2xl font-semibold">Education</h2>
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">Dr. rer. nat. Physik</h3>
+                <p class="text-sm base-content">February 2018 - May 2023 | University of Freiburg, DE</p>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">M. Sc. Physik</h3>
+                <p class="text-sm base-content">October 2015 - November 2017 | University of Freiburg, DE</p>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">B.Sc. Physics</h3>
+                <p class="text-sm base-content">October 2012 - September 2015 | University of Freiburg, DE</p>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            <div class="p-4 base-100 rounded shadow">
+                <h3 class="text-lg font-semibold base-content">Abitur</h3>
+                <p class="text-sm base-content">June 2012 | Oken-Gymnasium Offenburg, DE</p>
+            </div>
         </div>
     </section>
 </BaseLayout>
