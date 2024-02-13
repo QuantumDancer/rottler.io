@@ -7,8 +7,12 @@ publishDate: 2024-01-03
 
 The first part of the challenge is to build a webpage with HTML and CSS.
 To make this easier, I have decided to use two frameworks: [Astro](https://astro.build/) and [Tailwind CSS](https://tailwindcss.com/).
+Right now, I will focus on only building parts of the webpage, i.e., the frontpage and the blog section.
+Once this is finished, I can continue on setting up the needed AWS infrastructure and CI/CD pipeline that will deploy the infrastructure and webpage content.
+The CV section and overview of recent work experience will follow later.
 
 Astro is a web framework that enables the creation of simple content-driven websites.
+Furthermore, it supports the generation of static sites, i.e., no backend is needed.
 A blog can be easily implemented via Astro's [Content Collections](https://docs.astro.build/en/guides/content-collections/).
 It also supports writing content in Markdown which is automatically converted to HTML.
 Actually, the text you are reading right now is written in Markdown.
