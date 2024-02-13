@@ -4,7 +4,7 @@ import { Icon } from "astro-icon/components"
 // Main menu items
 const textLinks: { label: string; href: string }[] = [
     { label: "CV", href: "/cv/" },
-    { label: "Work", href: "/work/" },
+    // { label: "Work", href: "/work/" },
     { label: "Blog", href: "/blog/" },
 ]
 
@@ -29,10 +29,7 @@ const socialLinks: { label: string; href: string; icon: string }[] = [
                     <div tabindex="0" role="button" class="btn btn-ghost md:hidden">
                         <Icon name="list" class="h-5 w-5" />
                     </div>
-                    <ul
-                        tabindex="0"
-                        class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-                    >
+                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                         {
                             textLinks.map(({ label, href }) => (
                                 <li>
