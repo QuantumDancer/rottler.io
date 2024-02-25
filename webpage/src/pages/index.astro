@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro"
 
+import { Icon } from "astro-icon/components"
 import { Image } from "astro:assets"
 import portrait from "../media/portrait_square.jpg"
 ---
@@ -9,35 +10,58 @@ import portrait from "../media/portrait_square.jpg"
     <div class="hero">
         <div class="hero-content flex-col lg:flex-row-reverse">
             <div class="mb-6 lg:my-0 lg:ml-10">
-                <Image
-                    src={portrait}
-                    width="320"
-                    height="320"
-                    alt="Benjamin Rottler"
-                    class="max-w-sm mask mask-squircle shadow-2xl"
-                />
+                <Image src={portrait} width="320" height="320" alt="Benjamin Rottler" class="max-w-sm mask mask-squircle shadow-2xl" />
             </div>
-            <div class="max-w-prose text-lg sm:text-xl">
-                <h1 class="text-3xl sm:text-5xl font-bold">Welcome!</h1>
-                <p class="mt-4 py-2 text-justify hyphens-auto">
-                    I'm a Linux system administrator and software developer for high energy-physics computing. My
-                    background is in experimental particle physics, where I obtained my PhD in 2023.
-                </p>
-                <p class="py-2 text-justify hyphens-auto">
-                    I've built this website as part of the <a
-                        class="link link-accent"
-                        href="https://cloudresumechallenge.dev/docs/the-challenge/aws/">Cloud Resume Challenge</a
-                    >. It is automatically deployed to AWS in a CI/CD pipeline using GitHub Actions and Terraform. The
-                    static content is hosted on S3 and delivered via CloudFront. You can read more about this in my blog
-                    or check out the code on GitHub.
-                </p>
-                <div class="mt-6 flex justify-around">
-                    <a href="/blog"><button class="btn btn-primary min-w-24">Blog</button></a>
-                    <a href="https://github.com/QuantumDancer/rottler.io/"
-                        ><button class="btn btn-primary min-w-24">GitHub</button></a
-                    >
+            <div>
+                <div class="max-w-prose text-lg sm:text-xl">
+                    <h1 class="text-3xl sm:text-5xl font-bold">Welcome!</h1>
+                    <p class="mt-4 py-2 text-justify hyphens-auto">
+                        I'm a Linux system administrator and software developer for high energy-physics computing. My background is in experimental particle physics, where I obtained my PhD in 2023.
+                    </p>
+                    <p class="py-2 text-justify hyphens-auto">
+                        I've built this website as part of the <a class="link link-accent" href="https://cloudresumechallenge.dev/docs/the-challenge/aws/">Cloud Resume Challenge</a>. It is automatically deployed to AWS in a CI/CD pipeline
+                        using GitHub Actions and Terraform. The static content is hosted on S3 and delivered via CloudFront. The view counter is implemented as a Lambda function that connects to a DynamoDB table. The Lambda function is
+                        triggered by an API Gateway endpoint, that is integrated into the CloudFront distribution. You can read more about this in my blog or check out the code on GitHub.
+                    </p>
+                    <div class="mt-6 flex justify-around">
+                        <a href="/blog"><button class="btn btn-primary min-w-24">Blog</button></a>
+                        <a href="https://github.com/QuantumDancer/rottler.io/"><button class="btn btn-primary min-w-24">GitHub</button></a>
+                    </div>
+                </div>
+                <div class="flex justify-center items-center mt-8">
+                    <div class="stats shadow">
+                        <div class="stat">
+                            <div class="stat-title text-center mb-4">Total Page Views</div>
+                            <div class="stat-value text-center flex justify-center items-center" id="view-counter-value"><Icon name="180-ring-with-bg" width={24} height={24} /></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        window.onload = async function () {
+            const response = await fetch("/api/view-counter", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ page: "/" }),
+            })
+
+            if (!response.ok) {
+                console.error("Failed to update view counter")
+                return
+            }
+
+            const data = await response.json()
+            const counterElement = document.querySelector("#view-counter-value")
+            if (counterElement === null) {
+                console.error("Failed to find counter element")
+                return
+            }
+            counterElement.textContent = data.viewCount
+        }
+    </script>
 </BaseLayout>
