@@ -1,14 +1,28 @@
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution#s3-origin
 
 locals {
-  cf_website_s3_origin_id = "S3-${aws_s3_bucket.website.id}"
+  cf_website_s3_origin_id  = "S3 Bucket"
+  cf_website_api_origin_id = "ViewCounterAPI"
 }
 
+# tfsec:ignore:aws-cloudfront-enable-waf
 resource "aws_cloudfront_distribution" "website" {
   origin {
     domain_name              = aws_s3_bucket.website.bucket_regional_domain_name
     origin_access_control_id = aws_cloudfront_origin_access_control.website.id
     origin_id                = local.cf_website_s3_origin_id
+  }
+
+  origin {
+    domain_name = replace(aws_apigatewayv2_api.view_counter.api_endpoint, "https://", "")
+    origin_id   = local.cf_website_api_origin_id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+    }
   }
 
   enabled         = true
@@ -38,6 +52,15 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
+  ordered_cache_behavior {
+    path_pattern           = "/api/*"
+    allowed_methods        = ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = local.cf_website_api_origin_id
+    cache_policy_id        = aws_cloudfront_cache_policy.view_counter_api.id
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
   price_class = "PriceClass_100"
 
   restrictions {
@@ -56,7 +79,26 @@ resource "aws_cloudfront_distribution" "website" {
 
 resource "aws_cloudfront_cache_policy" "website" {
   name        = "website-policy"
-  comment     = "Cache policy for ${local.domain_name}"
+  comment     = "Cache policy for Frontend"
+  default_ttl = 86400
+  min_ttl     = 0
+  max_ttl     = 31536000
+  parameters_in_cache_key_and_forwarded_to_origin {
+    headers_config {
+      header_behavior = "none"
+    }
+    cookies_config {
+      cookie_behavior = "none"
+    }
+    query_strings_config {
+      query_string_behavior = "none"
+    }
+  }
+}
+
+resource "aws_cloudfront_cache_policy" "view_counter_api" {
+  name        = "view-counter-api-policy"
+  comment     = "Cache policy for ViewCounter API"
   default_ttl = 86400
   min_ttl     = 0
   max_ttl     = 31536000
