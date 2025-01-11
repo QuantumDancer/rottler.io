@@ -40,11 +40,12 @@ resource "aws_cloudfront_distribution" "website" {
   aliases = local.cloudfront_aliases
 
   default_cache_behavior {
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = local.cf_website_s3_origin_id
-    cache_policy_id        = aws_cloudfront_cache_policy.website.id
-    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = local.cf_website_s3_origin_id
+    cache_policy_id            = aws_cloudfront_cache_policy.website.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers.id
+    viewer_protocol_policy     = "redirect-to-https"
 
     function_association {
       event_type   = "viewer-request"
@@ -111,6 +112,41 @@ resource "aws_cloudfront_cache_policy" "view_counter_api" {
     }
     query_strings_config {
       query_string_behavior = "none"
+    }
+  }
+}
+
+resource "aws_cloudfront_response_headers_policy" "security_headers" {
+  name = "security-headers"
+
+  # see https://www.scip.ch/en/?labs.20160121
+  security_headers_config {
+    # see https://content-security-policy.com/
+    content_security_policy {
+      content_security_policy = "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self'"
+      override                = true
+    }
+    content_type_options {
+      override = true
+    }
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+    strict_transport_security {
+      access_control_max_age_sec = "31536000"
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+    xss_protection {
+      protection = true
+      mode_block = true
+      override   = true
     }
   }
 }
