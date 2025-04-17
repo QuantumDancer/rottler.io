@@ -17,7 +17,7 @@ const allBlogPosts = await getCollection("blog")
                 })
                 .reverse()
                 .map((post) => (
-                    <a href={`/blog/${post.slug}/`}>
+                    <a href={`/blog/${post.id}/`}>
                         <div class="card bg-base-100 shadow-xl h-full">
                             <div class="card-body">
                                 <h2 class="card-title">{post.data.title}</h2>

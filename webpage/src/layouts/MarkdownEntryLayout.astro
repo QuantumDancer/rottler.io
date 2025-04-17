@@ -14,7 +14,7 @@ const { frontmatter, previous, next } = Astro.props
                 <div>
                     {
                         previous && (
-                            <a href={`/blog/${previous.slug}/`} class="btn btn-sm md:btn-md gap-2 lg:gap-3">
+                            <a href={`/blog/${previous.id}/`} class="btn btn-sm md:btn-md gap-2 lg:gap-3">
                                 <Icon name="caret-left" class="h-6 w-6 fill-current md:h-8 md:w-8" />
                                 <div class="flex flex-col items-start">
                                     <span class="text-base-content/50 hidden text-xs font-normal md:block">
@@ -29,7 +29,7 @@ const { frontmatter, previous, next } = Astro.props
                 <div>
                     {
                         next && (
-                            <a href={`/blog/${next.slug}/`} class="btn btn-neutral btn-sm md:btn-md gap-2 lg:gap-3">
+                            <a href={`/blog/${next.id}/`} class="btn btn-neutral btn-sm md:btn-md gap-2 lg:gap-3">
                                 <div class="flex flex-col items-end">
                                     <span class="text-neutral-content/50 hidden text-xs font-normal md:block">
                                         Next
