@@ -1,24 +1,24 @@
 ---
-import { getCollection } from "astro:content"
+import { getCollection, render } from "astro:content"
 import MarkdownEntryLayout from "../../layouts/MarkdownEntryLayout.astro"
 
 export async function getStaticPaths() {
     const blogEntries = await getCollection("blog")
     return blogEntries.map((entry) => ({
-        params: { slug: entry.slug },
+        params: { id: entry.id },
         props: { entry },
     }))
 }
 
 const { entry } = Astro.props
-const { Content } = await entry.render()
+const { Content } = await render(entry)
 
 // Get the previous and next entries
 const blogEntries = (await getCollection("blog")).sort((a, b) => {
     return a.id > b.id ? 1 : -1
 })
 
-const currentIndex = blogEntries.findIndex((e) => e.slug === entry.slug)
+const currentIndex = blogEntries.findIndex((e) => e.id === entry.id)
 const previousEntry = currentIndex > 0 ? blogEntries[currentIndex - 1] : null
 const nextEntry = currentIndex < blogEntries.length - 1 ? blogEntries[currentIndex + 1] : null
 ---
