@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import portrait from '../assets/portrait.jpg';
 import { socialLinks } from '../data/site';
 import { getPublishedPosts } from '../lib/posts';
 
@@ -20,15 +22,24 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
       <h1 class="headline">
         Platform engineer building boring, reliable infrastructure.
       </h1>
+      <Image
+        src={portrait}
+        alt="Portrait of Benjamin Rottler"
+        width={296}
+        height={296}
+        class="portrait"
+      />
       <!-- TODO(benjamin): review bio wording -->
       <p class="lede">
         I design and run cloud platforms on <strong>Azure, Kubernetes, and
-        AWS</strong> — the kind where deploys are dull, upgrades are reversible,
-        and on-call is quiet. I write about what breaks along the way.
+        AWS</strong> — the kind where deploys are dull, upgrades are
+        reversible, and on-call is quiet. I write about what breaks along the
+        way.
       </p>
       <p class="lede">
         Currently deep in internal developer platforms, and running a <a
-          href="/projects/">homelab</a> that has long stopped being reasonable.
+          href="/projects/">homelab</a> that has long stopped being
+        reasonable.
       </p>
       <nav class="social" aria-label="Social links">
         {
@@ -66,6 +77,30 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
     max-width: 660px;
     margin: 0 auto;
     padding: 88px 32px 120px;
+  }
+
+  /* Two-column grid: text left, portrait right. The portrait sits in the
+     headline's row so their tops align (the kicker row stays text-only);
+     on mobile the grid collapses and the markup order — headline, portrait,
+     lede — reads top to bottom. */
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 40px;
+    align-items: start;
+  }
+
+  .intro > :not(.portrait) {
+    grid-column: 1;
+  }
+
+  .portrait {
+    grid-column: 2;
+    grid-row: 2 / span 3;
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    border: 1px solid var(--border2);
   }
 
   .kicker {
@@ -169,6 +204,17 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
     }
     .headline {
       font-size: 29px;
+    }
+    .intro {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .portrait {
+      grid-column: 1;
+      grid-row: auto;
+      justify-self: center;
+      width: 128px;
+      height: 128px;
+      margin: 8px 0 28px;
     }
     .post-row {
       flex-direction: column;

@@ -190,6 +190,13 @@ a:hover {
   text-decoration: none;
 }
 
+.site-brand .brand-glyph {
+  color: var(--accent);
+  /* The brand row baseline-aligns its text; an SVG has no baseline, so
+     center it against the name instead. */
+  align-self: center;
+}
+
 .site-brand .brand-name {
   font-size: 16px;
   font-weight: 700;
