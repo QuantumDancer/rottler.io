@@ -3,6 +3,52 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Page not found | Benjamin Rottler">
-  <h1>404 — Page not found</h1>
-  <p>The page you were looking for doesn't exist. <a href="/">Back to home</a>.</p>
+  <main class="notfound fade-up">
+    <p class="kicker">404</p>
+    <h1 class="headline">Page not found</h1>
+    <p class="lede">
+      The page you were looking for doesn't exist. <a href="/">Back to home</a>.
+    </p>
+  </main>
 </BaseLayout>
+
+<style>
+  .notfound {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 88px 32px 120px;
+  }
+
+  .kicker {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    margin: 0 0 20px;
+  }
+
+  .headline {
+    font-size: 38px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.022em;
+    color: var(--strong);
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: 17px;
+    line-height: 1.75;
+    margin: 0;
+    color: var(--muted);
+  }
+
+  @media (max-width: 760px) {
+    .notfound {
+      padding: 56px 20px 88px;
+    }
+    .headline {
+      font-size: 29px;
+    }
+  }
+</style>

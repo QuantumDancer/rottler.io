@@ -1,15 +1,281 @@
 /*
- * Minimal structural baseline only. The visual design system is delivered by a
- * separate design track, so this file deliberately sets nothing beyond a
- * readable default font and a comfortable measure for the main content.
+ * Design system for rottler.io — tokens and global styles extracted from the
+ * Claude Design v1 output (project/design/v1/Design System.dc.html). That file
+ * is the visual reference; this file is the single place its tokens live.
+ *
+ * Themes: softened dark is the default (:root), light is a full override via
+ * [data-theme="light"] on <html>, set pre-paint by an inline script in
+ * BaseLayout. The accent is one oklch hue variable (--ah); amber is the
+ * default, teal/violet remain available via [data-accent].
  */
 
 :root {
-  font-family:
-    system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --ah: 75; /* accent hue: 75 amber · 172 teal · 302 violet */
+
+  --bg: #1e2023;
+  --bg2: #191b1e;
+  --surface: #25282c;
+  --code: #16181b;
+  --codehead: #1d2023;
+  --border: #34383d;
+  --border2: #2a2d31;
+  --text: #cfd2d6;
+  --strong: #f0f1f3;
+  --muted: #969ba2;
+  --faint: #63676e;
+  --accent: oklch(0.79 0.115 var(--ah));
+  --tint: oklch(0.79 0.115 var(--ah) / 0.13);
+  --hl: oklch(0.79 0.115 var(--ah) / 0.07);
+
+  /* Syntax highlighting: keywords, strings, numbers, functions, comments. */
+  --sx-k: #8db2d8;
+  --sx-s: #9cc48f;
+  --sx-n: #c7a1dd;
+  --sx-f: #dcb277;
+  --sx-c: #63676e;
+
+  /* Semantic colors — reserved for callouts and status chips. */
+  --warn: #d9a53f;
+  --warn-bg: rgba(217, 165, 63, 0.09);
+  --info: #639fd2;
+  --info-bg: rgba(99, 159, 210, 0.09);
+  --ok: #5bb27a;
+  --ok-bg: rgba(91, 178, 122, 0.09);
+
+  color-scheme: dark;
 }
 
-main {
-  max-width: 70ch;
-  margin-inline: auto;
+[data-accent='teal'] {
+  --ah: 172;
+}
+[data-accent='violet'] {
+  --ah: 302;
+}
+
+[data-theme='light'] {
+  --bg: #faf9f7;
+  --bg2: #f2f1ee;
+  --surface: #ffffff;
+  --code: #f4f3f0;
+  --codehead: #eceae6;
+  --border: #dcdad4;
+  --border2: #e7e5e0;
+  --text: #3c3f44;
+  --strong: #17191c;
+  --muted: #6d7178;
+  --faint: #a0a3a9;
+  /* Light accent drops lightness and raises chroma to keep contrast. */
+  --accent: oklch(0.52 0.125 var(--ah));
+  --tint: oklch(0.52 0.125 var(--ah) / 0.1);
+  --hl: oklch(0.52 0.125 var(--ah) / 0.06);
+
+  --sx-k: #3d6a99;
+  --sx-s: #4e7d41;
+  --sx-n: #84549e;
+  --sx-f: #9a6a25;
+  --sx-c: #a0a3a9;
+
+  --warn: #a87718;
+  --warn-bg: rgba(168, 119, 24, 0.08);
+  --info: #33689a;
+  --info-bg: rgba(51, 104, 154, 0.07);
+  --ok: #2f7d4d;
+  --ok-bg: rgba(47, 125, 77, 0.08);
+
+  color-scheme: light;
+}
+
+/* ---------------------------------------------------------------- base --- */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  font-family: 'Hanken Grotesk Variable', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+code,
+pre,
+kbd {
+  font-family: 'JetBrains Mono Variable', monospace;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklch, var(--accent) 45%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  transition: text-decoration-color 0.15s;
+}
+
+a:hover {
+  text-decoration-color: var(--accent);
+}
+
+::selection {
+  background: var(--tint);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Entry animation; stagger blocks via --fade-delay on the element. */
+.fade-up {
+  animation: fadeUp 0.5s ease both;
+  animation-delay: var(--fade-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ----------------------------------------------------------- utilities --- */
+
+/* Mono uppercase section label — "label · 12/600/caps" in the type scale. */
+.section-label {
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------- site chrome --- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 48px;
+  border-bottom: 1px solid var(--border2);
+  background: var(--bg2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  transition: background-color 0.3s;
+}
+
+.site-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.site-brand .brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--strong);
+}
+
+.site-brand .brand-domain {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono Variable', monospace;
+}
+
+.site-header-right {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.site-nav {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.site-nav a {
+  text-decoration: none;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+
+.site-nav a:hover {
+  color: var(--text);
+}
+
+.site-nav a[aria-current='page'],
+.site-nav a[aria-current='true'] {
+  color: var(--accent);
+}
+
+.theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 99px;
+  width: 32px;
+  height: 32px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* The toggle renders both glyphs; the active theme picks which one shows. */
+.theme-toggle .icon-moon,
+[data-theme='light'] .theme-toggle .icon-sun {
+  display: none;
+}
+[data-theme='light'] .theme-toggle .icon-moon {
+  display: inline;
+}
+
+.site-footer {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 0 32px 48px;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.site-footer p {
+  margin: 0;
+  border-top: 1px solid var(--border2);
+  padding-top: 20px;
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    padding: 12px 20px;
+  }
+  .site-brand .brand-domain {
+    display: none;
+  }
+  .site-nav {
+    gap: 16px;
+  }
 }

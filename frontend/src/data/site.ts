@@ -23,10 +23,11 @@ export const socialLinks: SocialLink[] = [
   // for the rebuild: an off-topic, dated tone for the new professional site.
 ];
 
-// Primary navigation shown in the header.
+// Primary navigation shown in the header. Order and the "Writing" label
+// follow the Claude Design v1 pages; the blog lives under /writing/.
 export const navLinks: SocialLink[] = [
   { label: 'Home', href: '/' },
-  { label: 'CV', href: '/cv/' },
+  { label: 'Writing', href: '/writing/' },
   { label: 'Projects', href: '/projects/' },
-  { label: 'Blog', href: '/blog/' },
+  { label: 'CV', href: '/cv/' },
 ];

@@ -1,20 +1,178 @@
 ---
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import portrait from '../assets/portrait.jpg';
+import { socialLinks } from '../data/site';
+import { getPublishedPosts } from '../lib/posts';
+
+const recentPosts = (await getPublishedPosts()).slice(0, 3);
+
+// "Jun 14, 2026" — matches the Claude Design v1 mono date style.
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: '2-digit',
+  year: 'numeric',
+});
 ---
 
 <BaseLayout>
-  <section class="intro">
-    <Image src={portrait} width={320} height={320} alt="Benjamin Rottler" />
-    <div class="intro-text">
-      <h1>Welcome!</h1>
+  <main class="home">
+    <section class="intro fade-up">
+      <p class="kicker">hi, I'm Benjamin —</p>
+      <h1 class="headline">
+        Platform engineer building boring, reliable infrastructure.
+      </h1>
       <!-- TODO(benjamin): review bio wording -->
-      <p>
-        I'm a platform engineer working with Azure and Kubernetes. My background
-        is in experimental particle physics, where I obtained my PhD in 2023.
-        In my spare time I run a homelab to keep learning by breaking things.
+      <p class="lede">
+        I design and run cloud platforms on <strong>Azure, Kubernetes, and
+        AWS</strong> — the kind where deploys are dull, upgrades are reversible,
+        and on-call is quiet. I write about what breaks along the way.
       </p>
-    </div>
-  </section>
+      <p class="lede">
+        Currently deep in internal developer platforms, and running a <a
+          href="/projects/">homelab</a> that has long stopped being reasonable.
+      </p>
+      <nav class="social" aria-label="Social links">
+        {
+          socialLinks.map(({ label, href }) => (
+            <a href={href}>{label} ↗</a>
+          ))
+        }
+        <a href="/rss.xml">RSS ↗</a>
+      </nav>
+    </section>
+
+    <section class="writing fade-up" style="--fade-delay: .15s">
+      <div class="writing-head">
+        <h2 class="section-label">Recent writing</h2>
+        <a href="/writing/" class="all-posts">All posts →</a>
+      </div>
+      <div class="post-list">
+        {
+          recentPosts.map((post) => (
+            <a href={`/writing/${post.id}/`} class="post-row">
+              <span class="post-title">{post.data.title}</span>
+              <span class="post-date">
+                {dateFormatter.format(post.data.publishDate)}
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </main>
 </BaseLayout>
+
+<style>
+  .home {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 88px 32px 120px;
+  }
+
+  .kicker {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    margin: 0 0 20px;
+  }
+
+  .headline {
+    font-size: 38px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.022em;
+    color: var(--strong);
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: 17px;
+    line-height: 1.75;
+    margin: 0 0 16px;
+  }
+
+  .lede:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .lede strong {
+    color: var(--strong);
+    font-weight: 600;
+  }
+
+  .social {
+    display: flex;
+    gap: 18px;
+    margin-top: 30px;
+    font-size: 14px;
+  }
+
+  .social a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .writing {
+    margin-top: 88px;
+  }
+
+  .writing-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .all-posts {
+    font-size: 13.5px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .post-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-row {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    text-decoration: none;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border2);
+    transition: background-color 0.15s;
+  }
+
+  .post-row:hover {
+    background: var(--tint);
+  }
+
+  .post-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--strong);
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .post-date {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 12.5px;
+    color: var(--faint);
+    flex: none;
+  }
+
+  @media (max-width: 760px) {
+    .home {
+      padding: 56px 20px 88px;
+    }
+    .headline {
+      font-size: 29px;
+    }
+    .post-row {
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+</style>

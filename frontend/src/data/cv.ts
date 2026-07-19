@@ -41,6 +41,49 @@ export interface Education {
   institution: string;
 }
 
+export interface SkillGroup {
+  category: string;
+  // Comma-joined values on one line, matching the design's skills grid.
+  items: string;
+}
+
+export interface Certification {
+  name: string;
+  year: string;
+}
+
+// Header block for the CV page (heading, one-line summary, contact/PDF).
+export const profile = {
+  heading: 'Curriculum vitae',
+  // TODO(benjamin): confirm the tagline. The design mocked "9 years across cloud
+  // infrastructure", which only partly fits — the real path runs from research
+  // computing (particle physics) into platform engineering.
+  tagline: 'Platform engineer with a background in scientific research computing.',
+  // TODO(benjamin): current role is in Rotkreuz, CH; confirm which location to show.
+  location: 'Freiburg, Germany',
+  // TODO(benjamin): produce a downloadable CV PDF, then point this at it. Until
+  // then the download button falls back to a no-op href.
+  pdfUrl: undefined as string | undefined,
+};
+
+// Aggregated from the technologies named across the roles below and grouped to
+// match the design's skills grid.
+// TODO(benjamin): curate this — it is inferred from the experience section, not
+// an authored skills inventory (note cv.ts never mentions Kubernetes/Azure/AWS,
+// unlike the home-page bio).
+export const skills: SkillGroup[] = [
+  { category: 'Infrastructure as code', items: 'Ansible, Terraform, Puppet, Packer, Helm' },
+  { category: 'Observability', items: 'Prometheus, Grafana, Loki, Mimir, Alloy, Nagios' },
+  { category: 'Containers & delivery', items: 'Docker, Docker Compose, GitHub Actions' },
+  { category: 'Languages', items: 'Rust, Python, Bash' },
+  { category: 'Platforms & OS', items: 'Rocky Linux, AlmaLinux, HAProxy, Slurm, PostgreSQL' },
+];
+
+// TODO(benjamin): add certifications if any. The design mocked CKA / AZ-305 /
+// Terraform Associate as samples; none are in the real CV, so the section stays
+// hidden (empty array) until this is filled in.
+export const certifications: Certification[] = [];
+
 export const positions: Position[] = [
   {
     // Retitled from the legacy "Linux / Cloud Engineer"; same employer.

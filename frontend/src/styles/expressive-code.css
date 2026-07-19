@@ -1,0 +1,73 @@
+/*
+ * Expressive Code overrides that sit outside EC's styleOverrides API — the DOM
+ * surgery the theming knobs can't express. Frame colors, fonts, borders, the
+ * copy button and line highlights are all configured in astro.config.mjs; this
+ * file only reshapes two things to match the Claude Design v1 mockup:
+ *
+ *   1. the terminal titlebar (EC draws three faint traffic-light dots; the
+ *      design wants a single green status dot + left-aligned "terminal" label);
+ *   2. the language chip appended to editor-frame headers by pluginLanguageChip.
+ *
+ * Imported by the post page so it loads only where code blocks render.
+ */
+
+/* Block rhythm inside prose — replaces EC's default vertical margins. */
+.expressive-code {
+  margin: 26px 0;
+}
+
+/* -------------------------------------------------------- editor header --- */
+
+/* File path + language chip share one baseline-aligned row. */
+.frame.has-title:not(.is-terminal) .header {
+  align-items: center;
+  gap: 10px;
+}
+
+.ec-language-chip {
+  flex: none;
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--faint);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: 0.02em;
+}
+
+/* ------------------------------------------------------ terminal header --- */
+
+/*
+ * EC positions the title centered with three dots drawn as a masked ::before.
+ * The design is a single green dot followed by a left-aligned label, so we
+ * left-align the row, reserve space for the dot, and repaint ::before as one
+ * solid --ok circle (dropping EC's traffic-light mask).
+ */
+.frame.is-terminal .header {
+  justify-content: flex-start;
+  padding-inline-start: 34px;
+}
+
+.frame.is-terminal .header::before {
+  -webkit-mask-image: none;
+  mask-image: none;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 9px;
+  height: 9px;
+  border-radius: 99px;
+  background-color: var(--ok);
+  opacity: 1;
+}
+
+/*
+ * Shell blocks carry no title, so EC leaves the visible label empty (an nbsp).
+ * The design labels every terminal frame "terminal"; supply it here. A block
+ * with an explicit title keeps that title (this :empty rule won't match).
+ */
+.frame.is-terminal .title:empty::before {
+  content: 'terminal';
+  color: var(--muted);
+}

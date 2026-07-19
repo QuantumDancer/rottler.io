@@ -4,17 +4,164 @@ import { projects } from '../data/projects';
 ---
 
 <BaseLayout title="Projects | Benjamin Rottler">
-  <h1>Projects</h1>
-  <p>A few things I build and maintain outside of work.</p>
+  <div class="projects">
+    <div class="projects-intro fade-up">
+      <h1>Projects</h1>
+      <p>Things I run, maintain, or built to prove a point.</p>
+    </div>
 
-  <ul class="project-cards">
-    {
-      projects.map((project) => (
-        <li class="project-card">
-          <h2>{project.title}</h2>
-          <p>{project.description}</p>
-        </li>
-      ))
-    }
-  </ul>
+    <div class="projects-grid fade-up" style="--fade-delay: 0.12s">
+      {
+        projects.map((project) => {
+          // Cards link out only when there is a real destination; otherwise
+          // they render as a plain <article> rather than a dead anchor.
+          const CardTag = project.href ? 'a' : 'article';
+          return (
+            <CardTag class="project-card" href={project.href}>
+              <div class="project-card-head">
+                <span class="project-name">{project.title}</span>
+                <span
+                  class:list={[
+                    'status-chip',
+                    project.statusTone === 'accent' ? 'is-accent' : 'is-neutral',
+                  ]}
+                >
+                  {project.status}
+                </span>
+              </div>
+              <p class="project-desc">{project.description}</p>
+              <div class="project-tags">
+                {project.tags.map((tag) => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+            </CardTag>
+          );
+        })
+      }
+    </div>
+  </div>
 </BaseLayout>
+
+<style>
+  .projects {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 72px 32px 120px;
+  }
+
+  /* Intro column stays narrower than the card grid, per the mockup. */
+  .projects-intro {
+    max-width: 660px;
+  }
+
+  .projects-intro h1 {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.022em;
+    color: var(--strong);
+    margin: 0 0 10px;
+  }
+
+  .projects-intro p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0 0 48px;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-decoration: none;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 24px 26px;
+    transition:
+      background-color 0.3s,
+      border-color 0.15s;
+  }
+
+  .project-card:hover {
+    border-color: var(--border);
+    background: var(--surface);
+  }
+
+  .project-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .project-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--strong);
+  }
+
+  /* Design System §08 chips: accent = mono 11px accent on --tint;
+     neutral = same mono size, faint text with a hairline border. */
+  .status-chip {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 11px;
+    border-radius: 5px;
+    padding: 2px 8px;
+    flex: none;
+  }
+
+  .status-chip.is-accent {
+    color: var(--accent);
+    background: var(--tint);
+  }
+
+  .status-chip.is-neutral {
+    color: var(--faint);
+    border: 1px solid var(--border2);
+  }
+
+  .project-desc {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  /* margin-top:auto pins tags to the card bottom so uneven descriptions
+     still line their tag rows up across the grid. */
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 11px;
+    color: var(--faint);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 2px 8px;
+  }
+
+  @media (max-width: 760px) {
+    .projects {
+      padding: 48px 20px 88px;
+    }
+    .projects-intro h1 {
+      font-size: 29px;
+    }
+    .projects-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

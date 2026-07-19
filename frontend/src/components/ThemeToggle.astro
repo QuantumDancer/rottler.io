@@ -1,0 +1,26 @@
+---
+// Light/dark toggle. The current theme lives as data-theme on <html>, set
+// pre-paint by an inline script in BaseLayout <head>; this button only flips
+// and persists it. Both glyphs are in the markup — CSS shows the right one —
+// so the button needs no JS at render time and can't flash the wrong icon.
+---
+
+<button class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+  <span class="icon-sun" aria-hidden="true">☀</span>
+  <span class="icon-moon" aria-hidden="true">☾</span>
+</button>
+
+<script>
+  document.querySelectorAll('.theme-toggle').forEach((button) => {
+    button.addEventListener('click', () => {
+      const root = document.documentElement;
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem('rottler-theme', next);
+      } catch {
+        // Persistence is best-effort; the toggle still works for the session.
+      }
+    });
+  });
+</script>

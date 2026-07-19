@@ -1,0 +1,85 @@
+---
+// Semantic callout (Design System §05): tinted background, 30%-alpha border,
+// glyph, and a bold colored lead-in word. Authorable from .mdx posts, e.g.
+//   <Callout variant="warning">check your regional quota first.</Callout>
+// The slot holds the body prose; `title` overrides the default lead-in word.
+interface Props {
+  variant?: 'info' | 'warning' | 'success';
+  title?: string;
+}
+
+const { variant = 'info', title } = Astro.props;
+
+// Each variant binds a glyph, a default lead-in, and the semantic color token
+// pair (foreground + tint background) it renders with.
+const variants = {
+  info: { glyph: 'ⓘ', label: 'Info' },
+  warning: { glyph: '⚠', label: 'Warning' },
+  success: { glyph: '✓', label: 'Success' },
+} as const;
+
+const { glyph, label } = variants[variant];
+const leadIn = title ?? label;
+---
+
+<aside class={`callout callout-${variant}`} data-variant={variant}>
+  <span class="callout-glyph" aria-hidden="true">{glyph}</span>
+  <p class="callout-body">
+    <strong class="callout-lead">{leadIn}</strong>
+    <span class="callout-dash">—</span>
+    <slot />
+  </p>
+</aside>
+
+<style>
+  /*
+   * Color is driven per variant by a single --c token remapped from the
+   * semantic tokens in base.css, so the border (30% alpha via color-mix) and
+   * lead-in stay in sync with light/dark and never hardcode a color.
+   */
+  .callout {
+    display: flex;
+    gap: 12px;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 0 0 24px;
+    background: var(--c-bg);
+    border: 1px solid color-mix(in srgb, var(--c) 30%, transparent);
+  }
+
+  .callout-info {
+    --c: var(--info);
+    --c-bg: var(--info-bg);
+  }
+  .callout-warning {
+    --c: var(--warn);
+    --c-bg: var(--warn-bg);
+  }
+  .callout-success {
+    --c: var(--ok);
+    --c-bg: var(--ok-bg);
+  }
+
+  .callout-glyph {
+    flex: none;
+    color: var(--c);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .callout-body {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .callout-lead {
+    color: var(--c);
+    font-weight: 600;
+  }
+
+  .callout-dash {
+    color: var(--faint);
+  }
+</style>

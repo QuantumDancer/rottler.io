@@ -1,6 +1,9 @@
 ---
-import { site, navLinks, socialLinks } from '../data/site';
+import '@fontsource-variable/hanken-grotesk';
+import '@fontsource-variable/jetbrains-mono';
 import '../styles/base.css';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import { site, navLinks } from '../data/site';
 
 interface Props {
   title?: string;
@@ -8,10 +11,16 @@ interface Props {
 }
 
 const { title = site.name, description = site.description } = Astro.props;
+
+const currentPath = Astro.url.pathname;
+// A nav link is active for its whole section (e.g. /writing/ matches
+// /writing/some-post/), except Home, which only matches exactly.
+const isActive = (href: string) =>
+  href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,30 +36,37 @@ const { title = site.name, description = site.description } = Astro.props;
     />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <title>{title}</title>
+    <script is:inline>
+      // Apply the stored theme before first paint to avoid a flash of the
+      // wrong theme. Must stay inline and ahead of any stylesheet paint.
+      (() => {
+        try {
+          const stored = localStorage.getItem('rottler-theme');
+          if (stored === 'light') {
+            document.documentElement.dataset.theme = 'light';
+          }
+        } catch {}
+      })();
+    </script>
   </head>
   <body>
     <header class="site-header">
-      <a href="/" class="site-brand">{site.name}</a>
-      <nav class="site-nav" aria-label="Primary">
-        <ul>
+      <a href="/" class="site-brand">
+        <span class="brand-name">{site.name}</span>
+        <span class="brand-domain">rottler.io</span>
+      </a>
+      <div class="site-header-right">
+        <nav class="site-nav" aria-label="Primary">
           {
             navLinks.map(({ label, href }) => (
-              <li>
-                <a href={href}>{label}</a>
-              </li>
+              <a href={href} aria-current={isActive(href) ? 'page' : false}>
+                {label}
+              </a>
             ))
           }
-        </ul>
-      </nav>
-      <ul class="social-links" aria-label="Social links">
-        {
-          socialLinks.map(({ label, href }) => (
-            <li>
-              <a href={href}>{label}</a>
-            </li>
-          ))
-        }
-      </ul>
+        </nav>
+        <ThemeToggle />
+      </div>
     </header>
 
     <main>

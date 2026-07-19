@@ -1,0 +1,382 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts, type BlogPost } from '../../lib/posts';
+import '../../styles/expressive-code.css';
+
+// Build one page per published post. Because getPublishedPosts() drops drafts
+// in production, draft posts get no path here and never appear in `dist/`.
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+
+  return posts.map((post, index) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      // Posts are newest-first, so the neighbour toward index 0 is newer.
+      newer: posts[index - 1],
+      older: posts[index + 1],
+    },
+  }));
+}
+
+interface Props {
+  post: BlogPost;
+  newer?: BlogPost;
+  older?: BlogPost;
+}
+
+const { post, newer, older } = Astro.props;
+const { Content, headings } = await render(post);
+
+// The on-this-page TOC lists section headings only (h2/h3); the h1 title and
+// any deeper headings are excluded.
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+// Reading time at ~200 wpm, from the raw markdown body. Floored to a 1 min min.
+const words = (post.body ?? '').split(/\s+/).filter(Boolean).length;
+const readingMinutes = Math.max(1, Math.round(words / 200));
+---
+
+<BaseLayout
+  title={`${post.data.title} | Benjamin Rottler`}
+  description={post.data.description}
+>
+  <div class="post-shell">
+    <article class="post fade-up">
+      <header class="post-header">
+        {
+          post.data.tags.length > 0 && (
+            <p class="post-tags">
+              {post.data.tags.map((tag, i) => (
+                <>
+                  {i > 0 && <span class="post-tags-sep">·</span>}
+                  <span>{tag}</span>
+                </>
+              ))}
+            </p>
+          )
+        }
+        <h1>{post.data.title}</h1>
+        <div class="post-meta">
+          <time datetime={post.data.publishDate.toISOString()}>
+            {dateFormatter.format(post.data.publishDate)}
+          </time>
+          <span class="post-meta-sep">·</span>
+          <span>{readingMinutes} min read</span>
+        </div>
+      </header>
+
+      <div class="post-prose">
+        <Content />
+      </div>
+
+      <nav class="post-nav" aria-label="Post navigation">
+        {
+          older && (
+            <a class="post-nav-prev" href={`/writing/${older.id}/`}>
+              ← {older.data.title}
+            </a>
+          )
+        }
+        {
+          newer && (
+            <a class="post-nav-next" href={`/writing/${newer.id}/`}>
+              {newer.data.title} →
+            </a>
+          )
+        }
+      </nav>
+    </article>
+
+    {
+      tocHeadings.length > 0 && (
+        <aside class="post-toc" aria-label="On this page">
+          <p class="post-toc-label">On this page</p>
+          <nav>
+            {tocHeadings.map((h) => (
+              <a
+                href={`#${h.slug}`}
+                data-toc-link={h.slug}
+                class:list={['post-toc-link', { 'is-sub': h.depth === 3 }]}
+              >
+                {h.text}
+              </a>
+            ))}
+          </nav>
+        </aside>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<script>
+  // Scroll-spy: highlight the TOC entry for the section currently in view.
+  // Progressive enhancement — the TOC is fully usable (plain anchors) without
+  // it. rootMargin biases the "active" band toward the top third of the
+  // viewport so a heading activates as it settles into reading position.
+  const links = new Map<string, HTMLAnchorElement>();
+  document
+    .querySelectorAll<HTMLAnchorElement>('[data-toc-link]')
+    .forEach((a) => links.set(a.dataset.tocLink!, a));
+
+  if (links.size > 0) {
+    const headings = document.querySelectorAll<HTMLElement>(
+      '.post-prose :is(h2, h3)[id]',
+    );
+
+    const setActive = (id: string) => {
+      links.forEach((a, key) =>
+        a.classList.toggle('is-active', key === id),
+      );
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        }
+      },
+      { rootMargin: '-15% 0px -70% 0px' },
+    );
+
+    headings.forEach((h) => observer.observe(h));
+  }
+</script>
+
+<style>
+  .post-shell {
+    display: flex;
+    justify-content: center;
+    gap: 56px;
+    padding: 64px 48px 96px;
+  }
+
+  .post {
+    width: 100%;
+    max-width: 720px;
+    min-width: 0;
+  }
+
+  /* ------------------------------------------------------------ header --- */
+
+  .post-tags {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    margin: 0 0 16px;
+  }
+
+  .post-tags-sep {
+    color: var(--faint);
+  }
+
+  .post-header h1 {
+    font-size: 40px;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -0.022em;
+    color: var(--strong);
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+
+  .post-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 44px;
+  }
+
+  .post-meta-sep {
+    color: var(--faint);
+  }
+
+  /* ------------------------------------------------------------- prose --- */
+
+  /* Reading measure ~660px for text; code blocks and figures run full width. */
+  .post-prose :global(p),
+  .post-prose :global(ul),
+  .post-prose :global(ol),
+  .post-prose :global(blockquote) {
+    font-size: 17px;
+    line-height: 1.75;
+    margin: 0 0 24px;
+    max-width: 660px;
+  }
+
+  .post-prose :global(h2) {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--strong);
+    margin: 52px 0 16px;
+    scroll-margin-top: 90px;
+  }
+
+  .post-prose :global(h3) {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--strong);
+    margin: 36px 0 14px;
+    scroll-margin-top: 90px;
+  }
+
+  .post-prose :global(strong) {
+    color: var(--strong);
+    font-weight: 600;
+  }
+
+  /* Inline code chip — Design System §04. Excludes EC code, which owns its own
+     styling inside .expressive-code blocks. */
+  .post-prose :global(:not(pre) > code) {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 0.85em;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 2px 6px;
+    color: var(--strong);
+  }
+
+  .post-prose :global(ul),
+  .post-prose :global(ol) {
+    padding-left: 24px;
+  }
+
+  .post-prose :global(li) {
+    margin-bottom: 8px;
+  }
+
+  .post-prose :global(li)::marker {
+    color: var(--faint);
+  }
+
+  .post-prose :global(blockquote) {
+    border-left: 2px solid var(--accent);
+    padding-left: 20px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .post-prose :global(hr) {
+    border: none;
+    border-top: 1px solid var(--border2);
+    margin: 40px 0;
+  }
+
+  .post-prose :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+
+  /* ---------------------------------------------------------- prev/next --- */
+
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    border-top: 1px solid var(--border2);
+    margin-top: 56px;
+    padding-top: 24px;
+    font-size: 14px;
+  }
+
+  .post-nav a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .post-nav a:hover {
+    color: var(--text);
+  }
+
+  .post-nav-next {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  /* --------------------------------------------------------------- toc --- */
+
+  .post-toc {
+    width: 210px;
+    flex: none;
+    position: sticky;
+    top: 88px;
+    align-self: flex-start;
+    animation: fadeUp 0.5s ease 0.15s both;
+  }
+
+  .post-toc-label {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin: 0 0 14px;
+  }
+
+  .post-toc nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-left: 1px solid var(--border2);
+  }
+
+  .post-toc-link {
+    text-decoration: none;
+    font-size: 13.5px;
+    line-height: 1.45;
+    padding: 5px 0 5px 16px;
+    color: var(--muted);
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+    transition:
+      color 0.15s,
+      border-color 0.15s;
+  }
+
+  .post-toc-link.is-sub {
+    padding-left: 28px;
+  }
+
+  .post-toc-link:hover {
+    color: var(--text);
+  }
+
+  .post-toc-link.is-active {
+    color: var(--accent);
+    font-weight: 600;
+    border-left-color: var(--accent);
+  }
+
+  /* Below the two-column breakpoint the TOC is dropped; the article keeps its
+     reading measure and centers. */
+  @media (max-width: 900px) {
+    .post-shell {
+      gap: 0;
+      padding: 48px 20px 72px;
+    }
+    .post-toc {
+      display: none;
+    }
+    .post-header h1 {
+      font-size: 30px;
+    }
+  }
+</style>

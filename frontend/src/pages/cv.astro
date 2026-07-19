@@ -1,100 +1,445 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { positions, publications, education } from '../data/cv';
+import { site } from '../data/site';
+import {
+  profile,
+  positions,
+  skills,
+  publications,
+  education,
+  certifications,
+} from '../data/cv';
 ---
 
-<BaseLayout title={`CV | Benjamin Rottler`}>
-  <h1>CV</h1>
+<BaseLayout title="CV | Benjamin Rottler">
+  <div class="cv">
+    <header class="cv-head fade-up">
+      <h1 class="cv-heading">{profile.heading}</h1>
+      <a class="cv-download" href={profile.pdfUrl ?? '#'}>Download PDF ↓</a>
+    </header>
+    <p class="cv-summary fade-up" style="--fade-delay: 0.05s">
+      {profile.tagline} {profile.location} · <a href={`mailto:${site.email}`}
+        >{site.email}</a
+      >
+    </p>
 
-  <section class="cv-section">
-    <h2>Work Experience</h2>
-    {
-      positions.map((position) => (
-        <article class="cv-position">
-          <h3>{position.title}</h3>
-          <p class="cv-meta">
-            {position.organization} | {position.period}
-          </p>
+    <section class="cv-section fade-up" style="--fade-delay: 0.1s">
+      <h2 class="section-label">Experience</h2>
+      <div class="timeline">
+        {
+          positions.map((position, i) => (
+            <div class="timeline-entry">
+              {/* Most-recent role gets the accent dot; earlier roles fade. */}
+              <span class:list={['entry-dot', i === 0 && 'is-current']} />
+              <div class="entry-head">
+                <span class="entry-title">
+                  {position.title} · {position.organization}
+                </span>
+                <span class="entry-period">{position.period}</span>
+              </div>
 
-          {position.summary && <p>{position.summary}</p>}
+              {position.summary && (
+                <p class="entry-desc">{position.summary}</p>
+              )}
 
-          {position.highlights && (
-            <ul>
-              {position.highlights.map((item) => (
-                <li>{item}</li>
-              ))}
-            </ul>
-          )}
+              {position.highlights && (
+                <ul class="entry-list">
+                  {position.highlights.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              )}
 
-          {position.projects && (
-            <div class="cv-projects">
-              {position.projects.map((project) => (
-                <article class="cv-project">
-                  <h4>{project.title}</h4>
-                  <p class="cv-meta">{project.period}</p>
-
-                  {project.description && <p>{project.description}</p>}
-
-                  {project.links && project.links.length > 0 && (
-                    <ul class="cv-links">
-                      {project.links.map((link) => (
-                        <li>
-                          <a href={link.href}>{link.label}</a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <ul>
-                    {project.highlights.map((item) => (
-                      <li>{item}</li>
-                    ))}
-                  </ul>
-
-                  {project.technologies && (
-                    <p class="cv-technologies">
-                      Technologies used: {project.technologies}
-                    </p>
-                  )}
-                </article>
-              ))}
+              {position.projects && (
+                <div class="subprojects">
+                  {position.projects.map((project) => (
+                    <div class="subproject">
+                      <div class="entry-head">
+                        <span class="subproject-title">{project.title}</span>
+                        <span class="entry-period">{project.period}</span>
+                      </div>
+                      {project.description && (
+                        <p class="entry-desc">{project.description}</p>
+                      )}
+                      <ul class="entry-list">
+                        {project.highlights.map((item) => (
+                          <li>{item}</li>
+                        ))}
+                      </ul>
+                      {project.links && project.links.length > 0 && (
+                        <p class="inline-links">
+                          {project.links.map((link, li) => (
+                            <Fragment>
+                              {li > 0 && <span class="sep"> · </span>}
+                              <a href={link.href}>{link.label}</a>
+                            </Fragment>
+                          ))}
+                        </p>
+                      )}
+                      {project.technologies && (
+                        <p class="subproject-tech">
+                          <span class="tech-label">Stack</span>
+                          {project.technologies}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </article>
-      ))
-    }
-  </section>
+          ))
+        }
+      </div>
+    </section>
 
-  <section class="cv-section">
-    <h2>Publications and presentations</h2>
+    <section class="cv-section fade-up" style="--fade-delay: 0.15s">
+      <h2 class="section-label">Skills</h2>
+      <div class="skills-grid">
+        {
+          skills.map((group) => (
+            <Fragment>
+              <span class="skill-cat">{group.category}</span>
+              <span class="skill-vals">{group.items}</span>
+            </Fragment>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="cv-section fade-up" style="--fade-delay: 0.2s">
+      <h2 class="section-label">Publications &amp; talks</h2>
+      <div class="pubs">
+        {
+          publications.map((publication) => (
+            <article class="pub">
+              <span class="pub-title">{publication.title}</span>
+              <span class="pub-meta">{publication.meta}</span>
+              {publication.links.length > 0 && (
+                <p class="inline-links">
+                  {publication.links.map((link, li) => (
+                    <Fragment>
+                      {li > 0 && <span class="sep"> · </span>}
+                      <a href={link.href}>{link.label}</a>
+                    </Fragment>
+                  ))}
+                </p>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="cv-section fade-up" style="--fade-delay: 0.25s">
+      <h2 class="section-label">Education</h2>
+      <div class="cv-rows">
+        {
+          education.map((entry) => (
+            <div class="cv-row">
+              <span class="cv-row-label">
+                {entry.degree}
+                <span class="cv-row-sub">{entry.institution}</span>
+              </span>
+              <span class="cv-row-meta">{entry.period}</span>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
     {
-      publications.map((publication) => (
-        <article class="cv-publication">
-          <h3>{publication.title}</h3>
-          <p class="cv-meta">{publication.meta}</p>
-          <ul class="cv-links">
-            {publication.links.map((link) => (
-              <li>
-                <a href={link.href}>{link.label}</a>
-              </li>
+      certifications.length > 0 && (
+        <section class="cv-section fade-up" style="--fade-delay: 0.3s">
+          <h2 class="section-label">Certifications</h2>
+          <div class="cv-rows">
+            {certifications.map((cert) => (
+              <div class="cv-row">
+                <span class="cv-row-label">{cert.name}</span>
+                <span class="cv-row-meta">{cert.year}</span>
+              </div>
             ))}
-          </ul>
-        </article>
-      ))
+          </div>
+        </section>
+      )
     }
-  </section>
-
-  <section class="cv-section">
-    <h2>Education</h2>
-    {
-      education.map((entry) => (
-        <article class="cv-education">
-          <h3>{entry.degree}</h3>
-          <p class="cv-meta">
-            {entry.period} | {entry.institution}
-          </p>
-        </article>
-      ))
-    }
-  </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .cv {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 72px 32px 120px;
+  }
+
+  .cv-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+
+  .cv-heading {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.022em;
+    color: var(--strong);
+    margin: 0;
+  }
+
+  .cv-download {
+    font-size: 13.5px;
+    color: var(--muted);
+    text-decoration: none;
+    flex: none;
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 7px 14px;
+    transition:
+      color 0.15s,
+      border-color 0.15s;
+  }
+
+  .cv-download:hover {
+    color: var(--strong);
+    border-color: var(--border);
+  }
+
+  .cv-summary {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0 0 56px;
+  }
+
+  .cv-section {
+    margin-top: 64px;
+  }
+
+  /* Experience follows the summary's own 56px gap; no extra top margin. */
+  .cv-section:first-of-type {
+    margin-top: 0;
+  }
+
+  .cv-section > .section-label {
+    margin: 0 0 20px;
+  }
+
+  /* --------------------------------------------------------- timeline --- */
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    border-left: 1px solid var(--border2);
+    padding-left: 28px;
+  }
+
+  .timeline-entry {
+    position: relative;
+  }
+
+  .entry-dot {
+    position: absolute;
+    left: -32px;
+    top: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 99px;
+    background: var(--faint);
+  }
+
+  .entry-dot.is-current {
+    background: var(--accent);
+  }
+
+  .entry-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .entry-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--strong);
+  }
+
+  .entry-period {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 12px;
+    color: var(--faint);
+    flex: none;
+  }
+
+  .entry-desc {
+    margin: 8px 0 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .entry-list {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .entry-list li::marker {
+    color: var(--faint);
+  }
+
+  /* Nested projects under a role sit on their own indented rail. */
+  .subprojects {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    border-left: 1px solid var(--border2);
+    padding-left: 20px;
+  }
+
+  .subproject-title {
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--strong);
+  }
+
+  .subproject-tech {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: var(--faint);
+    line-height: 1.6;
+  }
+
+  .tech-label {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin-right: 8px;
+  }
+
+  .inline-links {
+    margin: 8px 0 0;
+    font-size: 13.5px;
+  }
+
+  .inline-links .sep {
+    color: var(--faint);
+  }
+
+  /* ----------------------------------------------------------- skills --- */
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 14px 24px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .skill-cat {
+    color: var(--faint);
+  }
+
+  .skill-vals {
+    color: var(--text);
+  }
+
+  /* ----------------------------------------------------- publications --- */
+
+  .pubs {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .pub {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .pub-title {
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--strong);
+    line-height: 1.5;
+  }
+
+  .pub-meta {
+    font-size: 13px;
+    color: var(--faint);
+    line-height: 1.5;
+  }
+
+  /* --------------------------------------------- education / certs rows --- */
+
+  .cv-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 15px;
+  }
+
+  .cv-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .cv-row-label {
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .cv-row-sub {
+    color: var(--faint);
+    font-size: 13px;
+  }
+
+  .cv-row-meta {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 12px;
+    color: var(--faint);
+    flex: none;
+  }
+
+  @media (max-width: 760px) {
+    .cv {
+      padding: 48px 20px 88px;
+    }
+    .cv-heading {
+      font-size: 28px;
+    }
+    .cv-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .skills-grid {
+      grid-template-columns: 1fr;
+      gap: 3px 0;
+    }
+    /* Stack the grid: each category gets breathing room above its values. */
+    .skill-cat {
+      margin-top: 14px;
+      font-size: 13px;
+    }
+    .skill-cat:first-child {
+      margin-top: 0;
+    }
+  }
+</style>
