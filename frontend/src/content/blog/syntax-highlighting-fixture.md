@@ -386,6 +386,56 @@ LIMIT 20;
  }
 ```
 
+## Word-level markers — string, regex, ins/del words
+
+```python "viewCount" /if_not_exists\(\w+/ ins="ReturnValues" del="ConsistentRead" title="app/marks.py"
+result = await table.update_item(
+    Key={"path": path},
+    UpdateExpression="SET viewCount = if_not_exists(viewCount, :z) + :n",
+    ExpressionAttributeValues={":z": 0, ":n": by},
+    ReturnValues="UPDATED_NEW",
+    ConsistentRead=True,
+)
+return int(result["Attributes"]["viewCount"])
+```
+
+## Line numbers — per-block opt-in with offset
+
+```go showLineNumbers startLineNumber=191 title="cmd/server/count.go"
+func handleCount(store Store[int64]) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+
+		count, err := store.Get(ctx, r.URL.Path)
+		if err != nil {
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+	}
+}
+```
+
+## Long lines — soft wrap
+
+```bash wrap
+aws cloudfront create-invalidation --distribution-id E2EXAMPLE123 --paths '/index.html' '/writing/*' '/assets/*' --output json --query 'Invalidation.{Id:Id,Status:Status,CreateTime:CreateTime}' --profile prod
+```
+
+## Frameless block
+
+```json frame="none"
+{ "frame": "none", "chrome": false }
+```
+
+## Console output — titled terminal block
+
+```console title="deploy session"
+$ ./deploy.sh rottler-io-site E2EXAMPLE123
+upload: dist/index.html to s3://rottler-io-site/index.html
+deployed 2026-07-19T14:02:11Z
+```
+
 ## Console output — terminal block
 
 ```console
