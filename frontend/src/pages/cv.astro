@@ -24,6 +24,20 @@ import {
     </p>
 
     <section class="cv-section fade-up" style="--fade-delay: 0.1s">
+      <h2 class="section-label">Skills</h2>
+      <div class="skills-grid">
+        {
+          skills.map((group) => (
+            <Fragment>
+              <span class="skill-cat">{group.category}</span>
+              <span class="skill-vals">{group.items}</span>
+            </Fragment>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="cv-section fade-up" style="--fade-delay: 0.15s">
       <h2 class="section-label">Experience</h2>
       <div class="timeline">
         {
@@ -92,21 +106,23 @@ import {
       </div>
     </section>
 
-    <section class="cv-section fade-up" style="--fade-delay: 0.15s">
-      <h2 class="section-label">Skills</h2>
-      <div class="skills-grid">
-        {
-          skills.map((group) => (
-            <Fragment>
-              <span class="skill-cat">{group.category}</span>
-              <span class="skill-vals">{group.items}</span>
-            </Fragment>
-          ))
-        }
-      </div>
-    </section>
+    {
+      certifications.length > 0 && (
+        <section class="cv-section fade-up" style="--fade-delay: 0.2s">
+          <h2 class="section-label">Certifications</h2>
+          <div class="cv-rows">
+            {certifications.map((cert) => (
+              <div class="cv-row">
+                <span class="cv-row-label">{cert.name}</span>
+                <span class="cv-row-meta">{cert.year}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
 
-    <section class="cv-section fade-up" style="--fade-delay: 0.2s">
+    <section class="cv-section fade-up" style="--fade-delay: 0.25s">
       <h2 class="section-label">Publications &amp; talks</h2>
       <div class="pubs">
         {
@@ -130,7 +146,7 @@ import {
       </div>
     </section>
 
-    <section class="cv-section fade-up" style="--fade-delay: 0.25s">
+    <section class="cv-section fade-up" style="--fade-delay: 0.3s">
       <h2 class="section-label">Education</h2>
       <div class="cv-rows">
         {
@@ -147,21 +163,6 @@ import {
       </div>
     </section>
 
-    {
-      certifications.length > 0 && (
-        <section class="cv-section fade-up" style="--fade-delay: 0.3s">
-          <h2 class="section-label">Certifications</h2>
-          <div class="cv-rows">
-            {certifications.map((cert) => (
-              <div class="cv-row">
-                <span class="cv-row-label">{cert.name}</span>
-                <span class="cv-row-meta">{cert.year}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )
-    }
   </div>
 </BaseLayout>
 
@@ -217,7 +218,7 @@ import {
     margin-top: 64px;
   }
 
-  /* Experience follows the summary's own 56px gap; no extra top margin. */
+  /* The first section follows the summary's own 56px gap; no extra top margin. */
   .cv-section:first-of-type {
     margin-top: 0;
   }

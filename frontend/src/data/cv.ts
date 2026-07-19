@@ -59,47 +59,53 @@ export const profile = {
   // infrastructure", which only partly fits — the real path runs from research
   // computing (particle physics) into platform engineering.
   tagline: 'Platform engineer with a background in scientific research computing.',
-  // TODO(benjamin): current role is in Rotkreuz, CH; confirm which location to show.
-  location: 'Freiburg, Germany',
+  location: 'Rotkreuz, Switzerland',
   // TODO(benjamin): produce a downloadable CV PDF, then point this at it. Until
   // then the download button falls back to a no-op href.
   pdfUrl: undefined as string | undefined,
 };
 
-// Aggregated from the technologies named across the roles below and grouped to
-// match the design's skills grid.
-// TODO(benjamin): curate this — it is inferred from the experience section, not
-// an authored skills inventory (note cv.ts never mentions Kubernetes/Azure/AWS,
-// unlike the home-page bio).
+// Curated skills inventory, mirroring the groups in the LaTeX CV.
 export const skills: SkillGroup[] = [
-  { category: 'Infrastructure as code', items: 'Ansible, Terraform, Puppet, Packer, Helm' },
-  { category: 'Observability', items: 'Prometheus, Grafana, Loki, Mimir, Alloy, Nagios' },
-  { category: 'Containers & delivery', items: 'Docker, Docker Compose, GitHub Actions' },
-  { category: 'Languages', items: 'Rust, Python, Bash' },
-  { category: 'Platforms & OS', items: 'Rocky Linux, AlmaLinux, HAProxy, Slurm, PostgreSQL' },
+  { category: 'Containers & orchestration', items: 'Kubernetes, Helm, ArgoCD, Talos Linux, Docker, Podman' },
+  { category: 'Infrastructure as code', items: 'Ansible, Terraform, Packer, Puppet' },
+  { category: 'Observability & monitoring', items: 'Prometheus, Grafana, Grafana Alloy, Loki, Mimir, Nagios' },
+  { category: 'CI/CD & DevOps', items: 'Git, GitLab CI, GitHub Actions, Bitbucket Pipelines' },
+  { category: 'Cloud & virtualization', items: 'Azure, AWS, Proxmox' },
+  { category: 'Programming & scripting', items: 'Python, Rust, Bash, SQL, C++' },
+  { category: 'Spoken languages', items: 'German, English' },
 ];
 
-// TODO(benjamin): add certifications if any. The design mocked CKA / AZ-305 /
-// Terraform Associate as samples; none are in the real CV, so the section stays
-// hidden (empty array) until this is filled in.
-export const certifications: Certification[] = [];
+export const certifications: Certification[] = [
+  { name: 'Certified Kubernetes Administrator (CKA) — The Linux Foundation', year: 'March 2026' },
+  { name: 'AWS Certified Solutions Architect – Associate', year: 'June 2024' },
+];
 
 export const positions: Position[] = [
   {
-    // Retitled from the legacy "Linux / Cloud Engineer"; same employer.
-    title: 'Platform Engineer',
+    title: 'Teamlead Platform Engineering & Observability',
     organization: 'enovetic ag, Rotkreuz, Switzerland',
-    period: 'July 2024 - present',
-    // TODO(benjamin): update bullets for platform-engineering focus (Azure, Kubernetes)
+    period: 'July 2026 - present',
     highlights: [
-      'Co-manage 120+ Linux VMs across diverse production environments, including load balancers, web servers, database servers, FTP servers, and SMTP relays',
-      'Provide technical support to development teams and customer support operations',
-      'Led strategic migration from legacy load balancer solutions to HAProxy, implementing status monitoring through Grafana dashboards',
-      'Architected and implemented modular Ansible role structure for scalable VM management, transforming manual server administration into fully automated, version-controlled infrastructure deployments',
-      'Implement Rocky Linux 9 and Apache security hardening configurations based on CIS benchmarks',
-      'Orchestrated monitoring infrastructure migration from Nagios to modern Grafana/Loki/Mimir stack, configured Alloy for centralized log and metrics collection, and developed custom dashboards that enable self-service access to application metrics and logs for development teams',
-      'Implemented Prometheus Blackbox exporter allowing for synthetic testing across all company SaaS applications',
-      'Developed Terraform modules and Helm charts for automated deployment of multiple Flowable workflow engine instances',
+      "Lead a team of three engineers responsible for operating the company's Linux environment and driving platform-engineering initiatives",
+      'Drive the renewal of legacy Linux systems, rebuilding servers on the automated, Ansible-based infrastructure',
+      'Deliver a Linux-based development environment for application developers (Linux VMs, Podman, Development Containers)',
+      'Own the Flowable workflow platform (Terraform, Helm, AKS), running in production for a product team',
+      "Set up and evaluate Backstage as the company's internal developer portal, starting with the software catalog and templates for bootstrapping new applications",
+    ],
+  },
+  {
+    title: 'Linux / Cloud Engineer',
+    organization: 'enovetic ag, Rotkreuz, Switzerland',
+    period: 'July 2024 - June 2026',
+    highlights: [
+      'Co-managed 120+ Linux VMs across production environments, including load balancers, web, database, FTP, and SMTP servers',
+      'Designed and implemented a modular Ansible role structure, replacing manual server administration with fully automated, version-controlled deployments',
+      'Migrated monitoring from Nagios to the Grafana LGTM stack: Alloy for centralized log and metrics collection, self-service dashboards for development teams, and synthetic testing of all company SaaS applications via the Prometheus Blackbox exporter',
+      'Developed Terraform modules and Helm charts to deploy Flowable workflow engine instances on Kubernetes (AKS), with CI/CD pipelines for automated rollout of new versions',
+      'Designed and built an on-prem hyperconverged Proxmox/Ceph cluster to host a new Linux-VM-based development environment for application developers',
+      'Migrated legacy load balancers to HAProxy and hardened Rocky Linux 9 and Apache based on CIS benchmarks',
+      'Supported development and customer-support teams and took part in the IT infrastructure on-call rotation',
     ],
   },
   {
