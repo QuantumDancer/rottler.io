@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { positions, publications, education } from '../data/cv';
+---
+
+<BaseLayout title={`CV | Benjamin Rottler`}>
+  <h1>CV</h1>
+
+  <section class="cv-section">
+    <h2>Work Experience</h2>
+    {
+      positions.map((position) => (
+        <article class="cv-position">
+          <h3>{position.title}</h3>
+          <p class="cv-meta">
+            {position.organization} | {position.period}
+          </p>
+
+          {position.summary && <p>{position.summary}</p>}
+
+          {position.highlights && (
+            <ul>
+              {position.highlights.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          )}
+
+          {position.projects && (
+            <div class="cv-projects">
+              {position.projects.map((project) => (
+                <article class="cv-project">
+                  <h4>{project.title}</h4>
+                  <p class="cv-meta">{project.period}</p>
+
+                  {project.description && <p>{project.description}</p>}
+
+                  {project.links && project.links.length > 0 && (
+                    <ul class="cv-links">
+                      {project.links.map((link) => (
+                        <li>
+                          <a href={link.href}>{link.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <ul>
+                    {project.highlights.map((item) => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+
+                  {project.technologies && (
+                    <p class="cv-technologies">
+                      Technologies used: {project.technologies}
+                    </p>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+        </article>
+      ))
+    }
+  </section>
+
+  <section class="cv-section">
+    <h2>Publications and presentations</h2>
+    {
+      publications.map((publication) => (
+        <article class="cv-publication">
+          <h3>{publication.title}</h3>
+          <p class="cv-meta">{publication.meta}</p>
+          <ul class="cv-links">
+            {publication.links.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))
+    }
+  </section>
+
+  <section class="cv-section">
+    <h2>Education</h2>
+    {
+      education.map((entry) => (
+        <article class="cv-education">
+          <h3>{entry.degree}</h3>
+          <p class="cv-meta">
+            {entry.period} | {entry.institution}
+          </p>
+        </article>
+      ))
+    }
+  </section>
+</BaseLayout>

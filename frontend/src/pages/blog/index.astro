@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts } from '../../lib/posts';
+
+// Newest-first; the design track will later turn this flat list into the
+// planned timeline layout, so each entry is kept as a self-contained item.
+const posts = await getPublishedPosts();
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title="Blog | Benjamin Rottler">
+  <h1>Blog</h1>
+
+  {posts.length === 0 && <p>No posts yet.</p>}
+
+  <ul class="post-list">
+    {
+      posts.map((post) => (
+        <li class="post-list-item">
+          <h2>
+            <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          </h2>
+          <p class="post-meta">
+            <time datetime={post.data.publishDate.toISOString()}>
+              {dateFormatter.format(post.data.publishDate)}
+            </time>
+          </p>
+          <p>{post.data.description}</p>
+          {post.data.tags.length > 0 && (
+            <ul class="post-tags">
+              {post.data.tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

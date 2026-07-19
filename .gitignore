@@ -1,1 +1,23 @@
+# Private knowledge base (never published)
 project/
+
+# Astro build output and generated types
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.production
+
+# OS / editor cruft
+.DS_Store
+.idea/

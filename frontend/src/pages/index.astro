@@ -1,0 +1,20 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import portrait from '../assets/portrait.jpg';
+---
+
+<BaseLayout>
+  <section class="intro">
+    <Image src={portrait} width={320} height={320} alt="Benjamin Rottler" />
+    <div class="intro-text">
+      <h1>Welcome!</h1>
+      <!-- TODO(benjamin): review bio wording -->
+      <p>
+        I'm a platform engineer working with Azure and Kubernetes. My background
+        is in experimental particle physics, where I obtained my PhD in 2023.
+        In my spare time I run a homelab to keep learning by breaking things.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
