@@ -7,7 +7,7 @@ import { projects } from '../data/projects';
   <div class="projects">
     <div class="projects-intro fade-up">
       <h1>Projects</h1>
-      <p>Things I run, maintain, or built to prove a point.</p>
+      <p>Some things I work on in my free time.</p>
     </div>
 
     <div class="projects-grid fade-up" style="--fade-delay: 0.12s">
@@ -18,17 +18,7 @@ import { projects } from '../data/projects';
           const CardTag = project.href ? 'a' : 'article';
           return (
             <CardTag class="project-card" href={project.href}>
-              <div class="project-card-head">
-                <span class="project-name">{project.title}</span>
-                <span
-                  class:list={[
-                    'status-chip',
-                    project.statusTone === 'accent' ? 'is-accent' : 'is-neutral',
-                  ]}
-                >
-                  {project.status}
-                </span>
-              </div>
+              <span class="project-name">{project.title}</span>
               <p class="project-desc">{project.description}</p>
               <div class="project-tags">
                 {project.tags.map((tag) => (
@@ -95,37 +85,10 @@ import { projects } from '../data/projects';
     background: var(--surface);
   }
 
-  .project-card-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
   .project-name {
     font-size: 18px;
     font-weight: 700;
     color: var(--strong);
-  }
-
-  /* Design System §08 chips: accent = mono 11px accent on --tint;
-     neutral = same mono size, faint text with a hairline border. */
-  .status-chip {
-    font-family: 'JetBrains Mono Variable', monospace;
-    font-size: 11px;
-    border-radius: 5px;
-    padding: 2px 8px;
-    flex: none;
-  }
-
-  .status-chip.is-accent {
-    color: var(--accent);
-    background: var(--tint);
-  }
-
-  .status-chip.is-neutral {
-    color: var(--faint);
-    border: 1px solid var(--border2);
   }
 
   .project-desc {
