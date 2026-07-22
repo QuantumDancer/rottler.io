@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import portrait from '../assets/portrait.jpg';
+import SocialIcon from '../components/SocialIcon.astro';
 import { socialLinks } from '../data/site';
 import { getPublishedPosts } from '../lib/posts';
 
@@ -36,11 +37,14 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
       </p>
       <nav class="social" aria-label="Social links">
         {
-          socialLinks.map(({ label, href }) => (
-            <a href={href}>{label} ↗</a>
+          socialLinks.map(({ label, href, icon }) => (
+            <a href={href}>
+              {icon && <SocialIcon name={icon} />}
+              {label} ↗
+            </a>
           ))
         }
-        <a href="/rss.xml">RSS ↗</a>
+        <a href="/rss.xml"><SocialIcon name="rss" />RSS ↗</a>
       </nav>
     </section>
 
@@ -135,9 +139,19 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
     font-size: 14px;
   }
 
+  /* Icon, label and the ↗ affordance sit on one baseline-ish row; the icon is
+     nudged down slightly because its 256-grid glyphs read high against text. */
   .social a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: var(--muted);
     text-decoration: none;
+  }
+
+  .social a svg {
+    flex: none;
+    translate: 0 1px;
   }
 
   .writing {

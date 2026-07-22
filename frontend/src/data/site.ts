@@ -2,9 +2,13 @@
 // the layout header/footer. Pages and the RSS feed read from here so there is
 // one source of truth for name/description/URL.
 
+import type { SocialIconName } from '../components/social-icons';
+
 export interface SocialLink {
   label: string;
   href: string;
+  /** Glyph shown left of the label; omitted for plain text links such as nav. */
+  icon?: SocialIconName;
 }
 
 export const site = {
@@ -15,9 +19,13 @@ export const site = {
 };
 
 export const socialLinks: SocialLink[] = [
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/benjamin-rottler' },
-  { label: 'GitHub', href: 'https://github.com/QuantumDancer' },
-  { label: 'Email', href: 'mailto:benjamin@rottler.io' },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/benjamin-rottler',
+    icon: 'linkedin',
+  },
+  { label: 'GitHub', href: 'https://github.com/QuantumDancer', icon: 'github' },
+  { label: 'Email', href: 'mailto:benjamin@rottler.io', icon: 'email' },
   // The legacy site also linked an Instagram profile
   // (https://www.instagram.com/quantumdancer93). It was intentionally dropped
   // for the rebuild: an off-topic, dated tone for the new professional site.
