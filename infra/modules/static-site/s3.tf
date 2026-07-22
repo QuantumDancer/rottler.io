@@ -129,8 +129,106 @@ resource "aws_s3_bucket_policy" "logs_bucket_policy" {
   policy = data.aws_iam_policy_document.logs_bucket_policy.json
 }
 
-# TODO(benjamin): neither bucket has a public access block, versioning, or an
-# explicit server-side-encryption configuration. These are genuine gaps carried
-# over from the legacy stack, deliberately not fixed here: they would be *new*
-# resources, and the migration plan's safety gate asserts zero adds. Follow-up
-# commit once Phase 3 has landed (see project/TF_MIGRATION.md, decision 8).
+# ==============================================================================
+# Hardening
+# ==============================================================================
+#
+# Carried-over gaps from the legacy stack, held back until the migration's
+# zero-add plan gate had passed (project/TF_MIGRATION.md, decision 8).
+
+# Neither bucket should ever be public. The website bucket is reached only
+# through CloudFront's OAC, and the log bucket only by the log delivery service.
+#
+# This is defence against a *future* mistake rather than a present one: today's
+# policies grant nothing public. The block makes that non-negotiable, so a
+# careless policy edit or a console click fails instead of quietly exposing the
+# bucket. It does not disturb the log bucket's `log-delivery-write` ACL — the
+# public-ACL controls target the AllUsers and AuthenticatedUsers grantees, and
+# log delivery is neither.
+resource "aws_s3_bucket_public_access_block" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_public_access_block" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Versioning on the website bucket is specifically insurance against the deploy
+# path. `aws s3 sync --delete` makes the bucket match a local directory, so a
+# broken build published by a careless run would otherwise be unrecoverable
+# except by rebuilding. With versioning, the previous site is still there.
+#
+# scripts/deploy.sh guards the same failure at the other end by refusing to sync
+# an empty or incomplete `dist/`. Neither control is redundant: the script
+# prevents the common mistake, versioning survives the uncommon one.
+resource "aws_s3_bucket_versioning" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Versioning without expiry is a slow storage leak: every deploy supersedes every
+# hashed asset, and the old versions would accumulate forever. Thirty days is far
+# longer than it would take to notice a bad deploy, and short enough that the
+# bucket stays small.
+resource "aws_s3_bucket_lifecycle_configuration" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  rule {
+    id     = "expire-noncurrent-versions-after-30-days"
+    status = "Enabled"
+
+    # Empty filter = every object. Stated explicitly because the provider treats
+    # a rule with no filter and no prefix as ambiguous.
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+  }
+}
+
+# S3 has encrypted new objects with SSE-S3 by default since January 2023, so
+# these blocks change no behaviour today. They are here to make the guarantee
+# explicit and enforced rather than inherited from an account-level default that
+# could change, and so that a compliance scan reads the intent from the config.
+#
+# SSE-S3 rather than SSE-KMS deliberately: KMS would add per-request cost and
+# key-policy coupling to CloudFront's OAC, buying nothing for objects that are
+# served to the public anyway.
+resource "aws_s3_bucket_server_side_encryption_configuration" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+# Intentionally omitted: versioning on the log bucket, which is append-only and
+# already expires at 90 days — versions would only double its storage. Also
+# omitted: an `abort_incomplete_multipart_upload` rule, since nothing here
+# uploads objects large enough to be multipart.
