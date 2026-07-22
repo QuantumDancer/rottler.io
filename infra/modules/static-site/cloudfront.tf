@@ -52,6 +52,33 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
+  # Without these, a mistyped URL returns CloudFront's generic XML error and the
+  # site's own 404 page is unreachable — Astro builds and uploads it, but nothing
+  # ever routes there.
+  #
+  # Both codes have to be mapped, and 403 is the one that actually matters. The
+  # bucket is private behind OAC with no `s3:ListBucket` grant, so S3 reports a
+  # missing key as `AccessDenied` (403) rather than `NoSuchKey` (404); a
+  # 404-only mapping would never fire. The 404 block is kept anyway so the
+  # behaviour does not silently depend on that policy detail staying as it is.
+  #
+  # Rewriting 403 to 404 is safe *because* the site is entirely public: every
+  # object is meant to be readable, so a 403 can only mean "not there". Were any
+  # path ever genuinely access-controlled, this would misreport it as missing.
+  custom_error_response {
+    error_code            = 403
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 300
+  }
+
+  custom_error_response {
+    error_code            = 404
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 300
+  }
+
   price_class = "PriceClass_100"
 
   restrictions {
