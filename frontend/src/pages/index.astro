@@ -117,10 +117,20 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
     text-wrap: balance;
   }
 
+  /* Justified with automatic hyphenation: the lede shares its row with the
+     portrait, so the measure is narrow enough that justification alone would
+     open rivers of whitespace. Hyphenation (English patterns, via the
+     `lang="en"` on <html>) keeps the inter-word spacing even. The limits stop
+     the browser from breaking short words or leaving one- or two-letter
+     fragments dangling at a line edge. */
   .lede {
     font-size: 17px;
     line-height: 1.75;
     margin: 0 0 16px;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphenate-limit-chars: 7 4 3;
   }
 
   .lede:last-of-type {
