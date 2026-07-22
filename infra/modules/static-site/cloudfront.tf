@@ -87,21 +87,36 @@ resource "aws_cloudfront_cache_policy" "website" {
   }
 }
 
-# Ported byte-identical from the legacy stack, including the counter-era
-# `connect-src`. The new Astro site needs `font-src 'self'` added — it self-hosts
-# Fontsource woff2 files and `font-src` has no fallback beyond `default-src
-# 'none'`, so fonts are currently blocked. That fix is deliberately held for
-# Phase 4 so the state-migration plan stays a pure address rename with no
-# incidental content diffs (project/TF_MIGRATION.md, decision 6).
-#
 # see https://www.scip.ch/en/?labs.20160121
 resource "aws_cloudfront_response_headers_policy" "security_headers" {
   name = "security-headers"
 
   security_headers_config {
+    # Everything is same-origin: the site has no third-party scripts, analytics,
+    # embeds, or CDN assets, so `default-src 'none'` plus a narrow allowlist is
+    # achievable rather than aspirational.
+    #
+    # Two entries are worth explaining:
+    #
+    #   * `font-src 'self'` — fonts are self-hosted via Fontsource and emitted
+    #     into `_astro/`. `font-src` does not fall back to anything but
+    #     `default-src`, so without this line every font request is blocked and
+    #     the site silently renders in fallback faces.
+    #
+    #   * `script-src 'unsafe-inline'` — required by the pre-paint theme script
+    #     in BaseLayout.astro, which must run inline and before first paint to
+    #     avoid a flash of the wrong theme. A nonce would be the stronger answer
+    #     but needs per-request header generation, which a static S3 origin
+    #     cannot do. The exposure is small: no user input reaches the page.
+    #
+    # Dropped from the legacy policy: `connect-src 'self'`, which existed for the
+    # visitor counter's fetch call. The site now ships no client-side networking
+    # at all — no view transitions, no prefetch — so it falls through to
+    # `default-src 'none'`. Reinstate it the moment anything starts fetching.
+    #
     # see https://content-security-policy.com/
     content_security_policy {
-      content_security_policy = "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self'"
+      content_security_policy = "default-src 'none'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'self'; form-action 'self'"
       override                = true
     }
     content_type_options {

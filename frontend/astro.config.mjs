@@ -147,7 +147,16 @@ function pluginLanguageChip() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://rottler.io',
+  // `site` is the root every absolute URL derives from — sitemap entries, RSS
+  // links, and canonicals — so building for dev.rottler.io with the prod value
+  // would publish a sitemap advertising rottler.io URLs from the dev host.
+  //
+  // The Makefile passes SITE_URL from the environment's `site_url` Terraform
+  // output, which keeps the two in lockstep without a second source of truth.
+  // The fallback is prod on purpose: a plain `npm run build` with no setup at
+  // all should produce the production site, so forgetting the variable is never
+  // the dangerous direction.
+  site: process.env.SITE_URL ?? 'https://rottler.io',
   integrations: [
     expressiveCode({
       themes: [
