@@ -21,3 +21,6 @@ pnpm-debug.log*
 # OS / editor cruft
 .DS_Store
 .idea/
+
+# Terraform snapshots, plan files, and other scratch artifacts
+tmp/

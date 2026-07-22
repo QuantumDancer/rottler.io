@@ -1,0 +1,31 @@
+# FROM https://github.com/github/gitignore/blob/main/Terraform.gitignore
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files — including the pre-migration snapshots taken in tmp/
+*.tfstate
+*.tfstate.*
+
+# Saved plan files. These are reviewed and applied locally, never committed:
+# a plan is only valid against the state it was generated from.
+*.tfplan
+
+# Crash log files
+crash.log
+crash.*.log
+
+# .tfvars may carry environment-specific data; this repo keeps per-env values in
+# the env root's locals instead, so any .tfvars here would be a local override.
+*.tfvars
+*.tfvars.json
+
+# Local override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration
+.terraformrc
+terraform.rc
