@@ -183,11 +183,17 @@ a:hover {
   transition: background-color 0.3s;
 }
 
+/* The padding/negative-margin pair grows the tap target without moving the
+   brand: below 450px the link collapses to the 16px glyph alone, which is
+   under the 24px minimum touch size. The negative margin lets the extra hit
+   area bleed into the header's own padding, so nothing shifts visually. */
 .site-brand {
   display: flex;
   align-items: baseline;
   gap: 10px;
   text-decoration: none;
+  padding: 6px;
+  margin: -6px;
 }
 
 .site-brand .brand-glyph {
@@ -284,5 +290,14 @@ a:hover {
   }
   .site-nav {
     gap: 16px;
+  }
+}
+
+/* Below ~450px the name wraps onto a second line and the header crowds, so the
+   brand collapses to the glyph alone. The link keeps its accessible name via
+   the aria-label in BaseLayout.astro. */
+@media (max-width: 450px) {
+  .site-brand .brand-name {
+    display: none;
   }
 }

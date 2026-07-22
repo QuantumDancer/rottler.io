@@ -142,9 +142,15 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
     font-weight: 600;
   }
 
+  /* The row wraps as a whole rather than letting individual links break: each
+     link is an atomic unit, so a narrow viewport pushes whole links onto the
+     next line instead of splitting "GitHub" from its ↗. Without the nowrap the
+     label and arrow separate, and `align-items: center` below then centers the
+     icon against the resulting two-line block. */
   .social {
     display: flex;
-    gap: 18px;
+    flex-wrap: wrap;
+    gap: 12px 18px;
     margin-top: 30px;
     font-size: 14px;
   }
@@ -155,6 +161,8 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex: none;
+    white-space: nowrap;
     color: var(--muted);
     text-decoration: none;
   }
@@ -232,6 +240,12 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
       width: 128px;
       height: 128px;
       margin: 8px 0 28px;
+    }
+    /* Centered from the same breakpoint at which the portrait centers, so the
+       whole intro switches to the one-column, centered-media arrangement in a
+       single step rather than changing alignment twice on the way down. */
+    .social {
+      justify-content: center;
     }
     .post-row {
       flex-direction: column;

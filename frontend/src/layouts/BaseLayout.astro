@@ -51,7 +51,9 @@ const isActive = (href: string) =>
   </head>
   <body>
     <header class="site-header">
-      <a href="/" class="site-brand">
+      <!-- Labelled explicitly because the narrow-viewport rules hide both text
+           spans, leaving only the aria-hidden glyph as the link's content. -->
+      <a href="/" class="site-brand" aria-label={site.name}>
         <!-- Same shell-prompt glyph as favicon.svg — keep the two in sync. -->
         <svg
           class="brand-glyph"
