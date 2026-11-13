@@ -21,7 +21,7 @@
     },
     {
       "description": "Terraform providers stay on the lockfile's exact versions until the AWS provider 6.x upgrade, which is gated on clean before/after plans and lifts this rule.",
-      "matchDatasources": ["terraform-provider"],
+      "matchPackageNames": ["hashicorp/aws", "hashicorp/random"],
       "enabled": false
     },
     {
