@@ -23,9 +23,17 @@ Account IDs, private infrastructure details, and planning notes belong in
 
 ## Verification
 
-- Frontend: `npm run build` in `frontend/` (Node >= 22.12). There are no tests
-  or linter; the build type-checks the content schemas.
-- Infra: `make check` (fmt, validate, tflint). `make help` lists every target.
+Tool versions are pinned in the root `mise.toml`, shared with CI
+(`.github/workflows/ci.yml`, credential-free, on PRs and `main`). CI only calls
+the commands below, so passing them locally predicts a green run.
+
+- Frontend: `npm run build` in `frontend/`. There are no tests or linter; the
+  build type-checks the content schemas.
+- Infra: `make check` (fmt, validate, tflint). A fresh checkout runs
+  `make check-init` first (init without the state backend). `make help` lists
+  every target.
+- Shell and workflows: `make lint` (shellcheck, actionlint).
+- New Terraform root: add it to the `infra` job's `env` matrix in `ci.yml`.
 
 ## Infra operations
 

@@ -8,8 +8,9 @@
 # There is deliberately no target that operates on "all environments" — the
 # blast radius of a deploy is meant to be one explicitly named site.
 #
-# CI is a later step; when it lands, the workflows should be thin wrappers
-# around these same targets so that what runs in CI is what runs locally.
+# CI (.github/workflows/ci.yml) is a thin wrapper around these same targets, so
+# that what runs in CI is what runs locally. Tool versions for both come from
+# the repo-root mise.toml.
 
 ENV ?= dev
 
@@ -31,25 +32,38 @@ define load_env
 	if [ -f $(TF_DIR)/env.sh ]; then set -a; . ./$(TF_DIR)/env.sh; set +a; fi
 endef
 
-.PHONY: help check fmt tf-init tf-plan tf-apply build deploy release
+.PHONY: help check-init check lint fmt tf-init tf-plan tf-apply build deploy release
 
 help:
 	@echo "Targets (ENV=$(ENV)):"
-	@echo "  check     fmt-check, validate, and tflint the Terraform"
-	@echo "  fmt       rewrite Terraform files to canonical format"
-	@echo "  tf-init   initialise the environment's Terraform working directory"
-	@echo "  tf-plan   plan into $(TF_DIR)/$(ENV).tfplan"
-	@echo "  tf-apply  apply that saved plan file"
-	@echo "  build     build the Astro site with SITE_URL from Terraform"
-	@echo "  deploy    sync frontend/dist to S3 and invalidate CloudFront"
-	@echo "  release   build then deploy"
+	@echo "  check-init  init without the state backend, so check runs credential-free"
+	@echo "  check       fmt-check, validate, and tflint the Terraform"
+	@echo "  lint        shellcheck the shell scripts, actionlint the workflows"
+	@echo "  fmt         rewrite Terraform files to canonical format"
+	@echo "  tf-init     initialise the environment's Terraform working directory"
+	@echo "  tf-plan     plan into $(TF_DIR)/$(ENV).tfplan"
+	@echo "  tf-apply    apply that saved plan file"
+	@echo "  build       build the Astro site with SITE_URL from Terraform"
+	@echo "  deploy      sync frontend/dist to S3 and invalidate CloudFront"
+	@echo "  release     build then deploy"
 
 # ==============================================================================
 # Terraform
 # ==============================================================================
 
-# Mirrors what the legacy repo's CI enforced, so that moving to GitHub Actions
-# later is a matter of calling this target rather than reimplementing it.
+# `validate` needs the provider plugins, which only `init` downloads — and a
+# normal init also opens the S3 state backend, which needs AWS credentials. CI
+# has none by design, so it runs this first: providers and modules, no backend.
+#
+# Separate from `check` rather than folded into it: a local working directory
+# is usually already initialised against the real backend, and re-running init
+# there on every check is slow and can trip over an expired SSO session.
+# `-lockfile=readonly` makes a provider/lockfile mismatch fail loudly instead of
+# being silently rewritten in CI.
+check-init:
+	terraform -chdir=$(TF_DIR) init -backend=false -input=false -lockfile=readonly
+
+# Mirrors what the legacy repo's CI enforced; CI calls it after check-init.
 check:
 	terraform -chdir=$(TF_DIR) fmt -check -recursive ../../
 	terraform -chdir=$(TF_DIR) validate
@@ -57,6 +71,12 @@ check:
 
 fmt:
 	terraform fmt -recursive infra/
+
+# Not environment-scoped: it covers every root's env.sh at once, since linting
+# has no blast radius.
+lint:
+	shellcheck scripts/*.sh infra/envs/*/env.sh
+	actionlint
 
 tf-init:
 	$(load_env)

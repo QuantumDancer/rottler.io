@@ -15,9 +15,11 @@ infrastructure managed by Terraform.
 
 ## Local development
 
-Requires Node >= 22.12.
+Tool versions (Node, Terraform, tflint, shellcheck, actionlint) are pinned in
+`mise.toml` and shared with CI; install them with [mise](https://mise.jdx.dev):
 
 ```sh
+mise install
 cd frontend
 npm install   # install dependencies
 npm run dev   # start the dev server at http://localhost:4321
@@ -35,6 +37,10 @@ make tf-plan ENV=dev   # write the plan to infra/envs/dev/dev.tfplan
 make tf-apply ENV=dev  # apply exactly that reviewed plan file
 make release ENV=dev   # build with the environment's SITE_URL, then deploy
 ```
+
+CI runs on every pull request and push to `main` without any AWS access: the
+site build, `make check-init` + `make check` per Terraform root, and `make lint`
+(shellcheck, actionlint). Renovate proposes dependency and tool updates weekly.
 
 Changes are plan-file first: what gets reviewed is exactly what gets applied.
 `make deploy` refuses to sync a missing or incomplete build, since the
