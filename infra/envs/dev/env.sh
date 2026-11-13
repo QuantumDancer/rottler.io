@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Sourced by the root Makefile: `. infra/envs/$(ENV)/env.sh`.
 #
 # Named env.sh rather than .env because the repo .gitignore swallows `.env`, and

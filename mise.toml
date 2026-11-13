@@ -1,0 +1,15 @@
+# The one place this repo's toolchain versions are pinned. Local work
+# (`mise install` once, then the usual commands) and CI (jdx/mise-action) both
+# read this file, so a check that passes on one passes on the other.
+#
+# Versions are exact on purpose; Renovate's mise manager proposes bumps as PRs.
+# The looser constraints in code (`required_version` in the Terraform roots,
+# `engines.node` in frontend/package.json) stay as the supported floor.
+
+[tools]
+# Node: even (LTS) majors only — Renovate is restricted accordingly.
+node = "26.13.0"
+terraform = "1.17.1"
+tflint = "0.60.0"
+shellcheck = "0.11.0"
+actionlint = "1.7.12"

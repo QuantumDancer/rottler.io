@@ -1,0 +1,76 @@
+# Credential-free checks for every PR and every push to main. Nothing here
+# talks to AWS: no OIDC, no secrets, read-only repository token. Deploy CI is a
+# separate workflow with its own trust boundary.
+#
+# Each job is a thin wrapper around a Makefile target or npm script, with tools
+# installed from the repo-root mise.toml, so a green local run predicts a green
+# CI run. The job names are the required status checks in the `main` ruleset:
+# renaming one means updating the ruleset too.
+#
+# Every action is pinned to a full commit SHA (the trailing comment is the
+# release it corresponds to); Renovate keeps both current.
+
+name: CI
+
+# No path filters: a required check that is skipped by a filter never reports,
+# and the PR waits on it forever.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to a PR supersedes the run in flight; runs on main always finish,
+# so every commit on main has a complete result.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Not `make build`: that target reads SITE_URL from Terraform output, which
+  # needs state access. Without SITE_URL the Astro config falls back to the
+  # production URL, which is what a check build should use anyway.
+  frontend:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          install_args: node
+      - run: npm --prefix frontend ci
+      - run: npm --prefix frontend run build
+
+  # One matrix entry per Terraform root under infra/envs/. Hard-coded on
+  # purpose, matching the Makefile's explicitly-named environments: a new root
+  # adds its line here.
+  infra:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [dev]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          install_args: terraform tflint
+      - run: make check-init ENV=${{ matrix.env }}
+      - run: make check ENV=${{ matrix.env }}
+
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          install_args: shellcheck actionlint
+      - run: make lint

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Weekly grouped updates, never automerged: `npm run build` does not catch rendering regressions (syntax highlighting above all), so frontend bumps get a look in `npm run dev` before merge.",
+  "extends": [
+    "config:recommended",
+    "group:allNonMajor",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "timezone": "Europe/Zurich",
+  "schedule": ["* 6-11 * * 6"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["* 6-11 1 * *"]
+  },
+  "packageRules": [
+    {
+      "description": "Node: even majors only; odd majors never become LTS.",
+      "matchManagers": ["mise"],
+      "matchDepNames": ["node"],
+      "allowedVersions": "/^[0-9]*[02468]\\./"
+    },
+    {
+      "description": "Terraform providers stay on the lockfile's exact versions until the AWS provider 6.x upgrade, which is gated on clean before/after plans and lifts this rule.",
+      "matchDatasources": ["terraform-provider"],
+      "enabled": false
+    },
+    {
+      "description": "Same reason: lockfile maintenance would bump the providers within their constraints.",
+      "matchManagers": ["terraform"],
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "enabled": false
+    }
+  ]
+}
