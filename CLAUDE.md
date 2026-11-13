@@ -36,6 +36,14 @@ the commands below, so passing them locally predicts a green run.
 - New Terraform root: add it to the `infra` job's `env` matrix in `ci.yml`,
   and its `infra (<env>)` check to the `main` ruleset's required checks.
 
+## Git workflow
+
+`main` is protected by a repository ruleset: changes land through a PR with
+the CI checks green, history stays linear, and force-pushes are blocked. Work
+on a branch, open a PR, and merge with rebase (`gh pr merge --rebase`); squash
+only when a branch's commits are noise. Merge commits are disabled. Benjamin
+can bypass the ruleset as admin; agents don't.
+
 ## Infra operations
 
 All AWS work runs through the root `Makefile`, scoped to one environment via
