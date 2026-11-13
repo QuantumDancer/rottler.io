@@ -20,9 +20,7 @@ terraform {
 
   required_providers {
     aws = {
-      source = "hashicorp/aws"
-      # 6.x from the start: this root shares no lockfile with envs/dev, which
-      # stays on 5.x until its own upgrade.
+      source  = "hashicorp/aws"
       version = "~> 6.0"
     }
     random = {

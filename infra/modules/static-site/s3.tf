@@ -86,6 +86,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   rule {
     id     = "expire-logs-after-90-days"
     status = "Enabled"
+
+    # Empty filter = every object, as on the website bucket's rule below.
+    # Provider 5.x tolerated its absence; 6.x plans to strip the live empty
+    # filter instead.
+    filter {}
+
     expiration {
       days = 90
     }

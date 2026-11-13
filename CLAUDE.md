@@ -54,9 +54,10 @@ All AWS work runs through the root `Makefile`, scoped to one environment via
 - `make release` builds with the environment's own `SITE_URL` (from Terraform
   output) and deploys via `scripts/deploy.sh`, whose preflight guards the
   `aws s3 sync --delete`.
-- The AWS provider stays pinned to the lockfile's 5.x (`~> 5.38`); run
-  `terraform init` without `-upgrade`. Moving to 6.x is its own change, gated by
-  clean before/after plans.
+- Each root's `.terraform.lock.hcl` is the provider pin; run `terraform init`
+  without `-upgrade`. Renovate proposes provider and lockfile bumps as PRs; a
+  bump to a new major lands only with a no-changes plan before it and a plan
+  after it in which every change is explained.
 
 ## Frontend architecture
 
