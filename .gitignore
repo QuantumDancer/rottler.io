@@ -24,3 +24,6 @@ pnpm-debug.log*
 
 # Terraform snapshots, plan files, and other scratch artifacts
 tmp/
+
+# Specs and tickets (local issue tracker; may name private infrastructure details)
+.scratch/
