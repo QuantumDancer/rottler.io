@@ -55,10 +55,10 @@ export interface Certification {
 // Header block for the CV page (heading, one-line summary, contact/PDF).
 export const profile = {
   heading: 'Curriculum vitae',
-  // TODO(benjamin): confirm the tagline. The design mocked "9 years across cloud
-  // infrastructure", which only partly fits — the real path runs from research
-  // computing (particle physics) into platform engineering.
-  tagline: 'Platform engineer with a background in scientific research computing.',
+  // The design mocked "9 years across cloud infrastructure", which only partly
+  // fits — the real path runs from research computing (particle physics) into
+  // leading a platform engineering team.
+  tagline: 'Platform engineering team lead with a background in scientific research computing.',
   location: 'Rotkreuz, Switzerland',
   // TODO(benjamin): produce a downloadable CV PDF, then point this at it. Until
   // then the download button falls back to a no-op href.
@@ -87,11 +87,12 @@ export const positions: Position[] = [
     organization: 'enovetic ag, Rotkreuz, Switzerland',
     period: 'July 2026 - present',
     highlights: [
-      "Lead a team of three engineers responsible for operating the company's Linux environment and driving platform-engineering initiatives",
+      "Lead a team of three engineers responsible for the company's Linux environment and platform engineering, setting technical standards and helping engineers grow",
+      "Rethink infrastructure and provisioning from scratch for the company's next-generation product platform, designed around golden paths and self-service from day one",
+      'Build the self-service automation that lets development teams provision environments, infrastructure and deployments on their own, with Backstage as the internal developer portal in front of it',
       'Drive the renewal of legacy Linux systems, rebuilding servers on the automated, Ansible-based infrastructure',
       'Deliver a Linux-based development environment for application developers (Linux VMs, Podman, Development Containers)',
       'Own the Flowable workflow platform (Terraform, Helm, AKS), running in production for a product team',
-      "Set up and evaluate Backstage as the company's internal developer portal, starting with the software catalog and templates for bootstrapping new applications",
     ],
   },
   {
