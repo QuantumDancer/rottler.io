@@ -18,17 +18,6 @@
       "matchManagers": ["mise"],
       "matchDepNames": ["node"],
       "allowedVersions": "/^[0-9]*[02468]\\./"
-    },
-    {
-      "description": "Terraform providers stay on the lockfile's exact versions until the AWS provider 6.x upgrade, which is gated on clean before/after plans and lifts this rule.",
-      "matchPackageNames": ["hashicorp/aws", "hashicorp/random"],
-      "enabled": false
-    },
-    {
-      "description": "Same reason: lockfile maintenance would bump the providers within their constraints.",
-      "matchManagers": ["terraform"],
-      "matchUpdateTypes": ["lockFileMaintenance"],
-      "enabled": false
     }
   ]
 }

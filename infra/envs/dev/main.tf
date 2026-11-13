@@ -26,12 +26,11 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      # Pinned to the version in the legacy lockfile, which was copied into this
-      # directory verbatim. The migration plan's whole safety argument is
-      # "0 add, 0 replace"; letting the provider float would fold provider
-      # behaviour changes into exactly the plan asserting nothing but addresses
-      # moved. The 5.x → 6.x jump is a separate PR (TF_MIGRATION.md, decision 5).
-      version = "~> 5.38"
+      # The same major as every other root. Until the 6.x upgrade this root
+      # stayed on the legacy lockfile's 5.x, so the migration plan's "0 add,
+      # 0 replace" check could not pick up provider behaviour changes. The
+      # upgrade was then gated on its own before and after plans.
+      version = "~> 6.0"
     }
     random = {
       source  = "hashicorp/random"
