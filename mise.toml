@@ -3,8 +3,10 @@
 # read this file, so a check that passes on one passes on the other.
 #
 # Versions are exact on purpose; Renovate's mise manager proposes bumps as PRs.
-# The looser constraints in code (`required_version` in the Terraform roots,
-# `engines.node` in frontend/package.json) stay as the supported floor.
+# The looser constraints in code stay as the supported range: `engines.node` in
+# frontend/package.json is a floor, and `required_version` (`~> 1.9`) in the
+# Terraform roots also caps Terraform below 2.0, so a 2.x bump here needs those
+# constraints moved in the same PR.
 
 [tools]
 # Node: even (LTS) majors only — Renovate is restricted accordingly.

@@ -33,7 +33,8 @@ the commands below, so passing them locally predicts a green run.
   `make check-init` first (init without the state backend). `make help` lists
   every target.
 - Shell and workflows: `make lint` (shellcheck, actionlint).
-- New Terraform root: add it to the `infra` job's `env` matrix in `ci.yml`.
+- New Terraform root: add it to the `infra` job's `env` matrix in `ci.yml`,
+  and its `infra (<env>)` check to the `main` ruleset's required checks.
 
 ## Infra operations
 

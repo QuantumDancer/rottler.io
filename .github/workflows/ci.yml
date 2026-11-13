@@ -23,11 +23,13 @@ on:
 permissions:
   contents: read
 
-# A new push to a PR supersedes the run in flight; runs on main always finish,
-# so every commit on main has a complete result.
+# A new push to a PR supersedes the run in flight. Every other run gets a group
+# of its own (keyed by run id): GitHub keeps only one *pending* run per group and
+# cancels the older one, so a shared group would silently skip commits on main
+# pushed in quick succession.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   # Not `make build`: that target reads SITE_URL from Terraform output, which
@@ -47,7 +49,8 @@ jobs:
 
   # One matrix entry per Terraform root under infra/envs/. Hard-coded on
   # purpose, matching the Makefile's explicitly-named environments: a new root
-  # adds its line here.
+  # adds its line here. Each entry reports as its own check (`infra (dev)`), so
+  # a new root's check also has to be added to the `main` ruleset.
   infra:
     runs-on: ubuntu-24.04
     strategy:
