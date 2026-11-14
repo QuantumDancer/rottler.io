@@ -2,7 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Page not found | Benjamin Rottler">
+<!-- No canonical: the CDN serves this page for every missing path with a 404
+     status, so it has no URL of its own to name, and the sitemap omits it. -->
+<BaseLayout title="Page not found | Benjamin Rottler" canonical={false}>
   <main class="notfound fade-up">
     <p class="kicker">404</p>
     <h1 class="headline">Page not found</h1>
