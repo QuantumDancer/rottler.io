@@ -179,12 +179,18 @@ resource "aws_cloudfront_origin_access_control" "website" {
   signing_protocol                  = "sigv4"
 }
 
-# A static site in S3 has no directory-index concept, so this viewer-request
-# function rewrites `/about` and `/about/` to `/about/index.html` — which is
-# exactly the shape Astro's static build emits.
+# The viewer-request function: 301s every host but `domain_name` to it, then
+# rewrites `/about` and `/about/` to `/about/index.html`. The template explains
+# why both jobs share one function.
+#
+# The resource address and `name` predate the redirect and are kept anyway:
+# renaming either replaces the function, and a replace has to detach it from the
+# distribution first. A code or comment change is an in-place update.
 resource "aws_cloudfront_function" "append_index_html" {
   name    = "append_index_html"
   runtime = "cloudfront-js-2.0"
-  comment = "Append index.html when it's missing from the URL"
-  code    = file("${path.module}/files/cloudfront_append_index_html.js")
+  comment = "Redirect to the canonical host; append index.html when it's missing from the URL"
+  code = templatefile("${path.module}/files/cloudfront_viewer_request.js.tftpl", {
+    canonical_host = var.domain_name
+  })
 }
