@@ -15,8 +15,9 @@
 crash.log
 crash.*.log
 
-# .tfvars may carry environment-specific data; this repo keeps per-env values in
-# the env root's locals instead, so any .tfvars here would be a local override.
+# .tfvars carry values that must not be public. Non-secret per-env values live
+# in the env root's locals; a .tfvars holds only what the public repo can't
+# show (envs/shared-services: the alert email address).
 *.tfvars
 *.tfvars.json
 
