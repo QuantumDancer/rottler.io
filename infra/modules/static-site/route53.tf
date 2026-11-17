@@ -5,11 +5,13 @@
 # The alias A record lives with the distribution rather than in the dns module
 # because it is meaningless without one: it points at a specific distribution's
 # domain, so its lifecycle is the site's, not the zone's. The zone itself is
-# passed in as `zone_id`, which is what lets the record be written into a zone
-# owned by a different account after the restructure.
+# passed in as `zone_id` and written through the `aws.dns` provider, so it can
+# belong to a different account from the distribution.
 #
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record#alias-record
 resource "aws_route53_record" "website" {
+  provider = aws.dns
+
   zone_id = var.zone_id
   name    = var.domain_name
   type    = "A"

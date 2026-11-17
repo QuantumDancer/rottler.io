@@ -6,11 +6,10 @@
 # the whole stack pins that region rather than this module doing anything
 # region-aware.
 #
-# `zone_id` is an input rather than a lookup because of where the account
-# restructure is heading: the apex zone will live in a shared-services account
-# while the certificate lives in prod. Taking the zone as a plain input means
-# that split becomes a wiring change (a cross-account provider alias supplied by
-# the caller) instead of a rewrite of this module.
+# The zone can live in a different account from the certificate (rottler.io's
+# zone is in shared-services, the cert in the website account), so the
+# validation records go through the caller-supplied `aws.dns` provider and the
+# zone arrives as a plain `zone_id` input.
 
 resource "aws_acm_certificate" "website_cert" {
   domain_name               = var.domain_name
@@ -41,6 +40,8 @@ resource "aws_route53_record" "acm_validation" {
       type   = dvo.resource_record_type
     }
   }
+
+  provider = aws.dns
 
   allow_overwrite = true
   name            = each.value.name
