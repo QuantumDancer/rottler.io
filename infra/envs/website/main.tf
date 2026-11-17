@@ -11,11 +11,10 @@
 # goes through the `aws.dns` provider, which assumes a role there that can write
 # only the apex/www alias records and `_*` validation CNAMEs.
 #
-# The distribution starts with no aliases, so the root writes no apex/www
-# records: until the alias move, the legacy distribution holds both names, and
-# CloudFront won't let two distributions claim the same alias. The alias move
-# adds them to `aliases` below, and static-site writes their records with them.
-# The cert covers both from the start.
+# The distribution serves the apex and www, and static-site writes their A and
+# AAAA records from `aliases`. Both names arrived in one alias move from the
+# legacy distribution: CloudFront won't let two distributions claim the same
+# alias, so the legacy side had to let go of them first.
 
 terraform {
   # 1.10 is the floor for S3 native locking (`use_lockfile`).
@@ -112,9 +111,10 @@ module "site" {
   domain_name  = local.domain_name
   project_name = local.project_name
 
-  # Empty until the alias move, which sets it to the apex and www (see the
-  # header).
-  aliases = []
+  # The apex is canonical; www only 301s to it through the viewer-request
+  # function, but still needs to be an alias for CloudFront to accept the
+  # request and present the cert.
+  aliases = [local.domain_name, "www.${local.domain_name}"]
 
   acm_certificate_arn = module.cert.certificate_arn
   zone_id             = data.aws_route53_zone.rottler_io.zone_id
