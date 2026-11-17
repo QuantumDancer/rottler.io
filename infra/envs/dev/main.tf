@@ -65,8 +65,15 @@ module "dns" {
   domain_name = local.domain_name
 }
 
+# dev's zone is in its own account, so the modules' `aws.dns` is just the
+# default provider.
 module "cert" {
   source = "../../modules/cert"
+
+  providers = {
+    aws     = aws
+    aws.dns = aws
+  }
 
   domain_name = local.domain_name
   zone_id     = module.dns.zone_id
@@ -77,6 +84,12 @@ module "cert" {
 
 module "site" {
   source = "../../modules/static-site"
+
+  providers = {
+    aws     = aws
+    aws.dns = aws
+    random  = random
+  }
 
   domain_name         = local.domain_name
   project_name        = local.project_name
