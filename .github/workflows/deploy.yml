@@ -70,7 +70,7 @@ jobs:
   # documented. The plan stays in the job log, where `mask-aws-account-id` and
   # secret masking apply.
   plan:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       id-token: write
@@ -125,7 +125,7 @@ jobs:
   apply:
     needs: plan
     if: github.event_name != 'pull_request' && needs.plan.outputs.changes == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     environment: website-terraform
     permissions:
       contents: read
@@ -164,7 +164,7 @@ jobs:
       && github.event_name != 'pull_request'
       && needs.plan.result == 'success'
       && (needs.apply.result == 'success' || needs.apply.result == 'skipped')
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     environment: website-release
     permissions:
       contents: read

@@ -36,7 +36,7 @@ jobs:
   # needs state access. Without SITE_URL the Astro config falls back to the
   # production URL, which is what a check build should use anyway.
   frontend:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -52,7 +52,7 @@ jobs:
   # adds its line here. Each entry reports as its own check (`infra (dev)`), so
   # a new root's check also has to be added to the `main` ruleset.
   infra:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -68,7 +68,7 @@ jobs:
       - run: make check ENV=${{ matrix.env }}
 
   lint:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
