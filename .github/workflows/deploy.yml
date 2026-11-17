@@ -1,0 +1,187 @@
+# Deploy CI for the website account: plan → apply → release of `envs/website`
+# and the site it serves.
+#
+# Separate from ci.yml because the trust boundary is different: these jobs
+# exchange a GitHub OIDC token for an AWS role. Each job assumes its own role,
+# defined in `infra/envs/website-bootstrap` (applied locally, never by CI),
+# whose trust pins the token's `sub` to that job's ref or GitHub environment:
+#
+#   plan     ci-plan     push to main, PR plans    read-only + lock + store plan
+#   apply    ci-apply    GitHub env website-terraform (Benjamin reviews)
+#   release  ci-release  GitHub env website-release (main only, no reviewer)
+#
+# Every role ARN is a secret, never a variable: secrets are masked in logs,
+# variables are printed, and an ARN names the account.
+#
+# Each job is a thin wrapper around the Makefile's `ENV=website` targets, with
+# tools from the repo-root mise.toml, so CI runs what a local session runs.
+# Actions are pinned to full commit SHAs (trailing comment = release);
+# Renovate keeps them current.
+#
+# Intentionally omitted: path filters. Every push to main plans, which doubles
+# as drift detection, and every push releases, so the bucket always matches main.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# `id-token: write` is granted per job, only to the jobs that assume a role.
+permissions:
+  contents: read
+
+# Explicit `bash` gets `-o pipefail`, which the default `run` shell lacks, so a
+# failing command on the left of a pipe fails the step.
+defaults:
+  run:
+    shell: bash
+
+# Runs on main share one group, so a plan can never race an apply. Pending runs
+# collapse to the newest, which replans; an older plan file would be refused as
+# stale anyway. Not cancel-in-progress: killing an apply mid-run can leave
+# resources half-made and the state lock held.
+#
+# PR plans get a group per PR instead. They don't lock state, and in the shared
+# group a PR push would evict a pending deploy from main.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('deploy-website-pr-{0}', github.ref) || 'deploy-website' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # The website account's state bucket, as committed in
+  # infra/envs/website/backend.tf (docs/adr/0001-terraform-backend-config-is-committed.md).
+  # The plan file travels through it under `plans/`, which the bucket expires
+  # after seven days.
+  STATE_BUCKET: rottler-io-website-tf-state-8bb2487a
+  PLAN_KEY: plans/${{ github.run_id }}.tfplan
+  PLAN_FILE: infra/envs/website/website.tfplan
+
+jobs:
+  # On PRs this job is a read-only preview: `-lock=false`, nothing stored,
+  # downstream jobs skipped. It isn't a required check. Fork PRs get no OIDC
+  # token or secrets and fail at the credentials step, which is fine.
+  #
+  # Why no PR comment with the plan, the usual practice: the repository is
+  # public, and a comment isn't masked. A plan prints ARNs, and ARNs carry
+  # account IDs. Neither is the step summary used, as its masking isn't
+  # documented. The plan stays in the job log, where `mask-aws-account-id` and
+  # secret masking apply.
+  plan:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      changes: ${{ steps.changes.outputs.changes }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          install_args: terraform
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_CI_PLAN }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+      - run: make tf-init ENV=website
+      - name: Plan
+        run: make tf-plan ENV=website
+        env:
+          # The read-only DNS role: a PR plan runs the PR's own provider code,
+          # so the planning identity must not reach a role that writes records.
+          TF_VAR_dns_role_arn: ${{ secrets.DNS_ROLE_READ }}
+          # Terraform's own hook for extra flags, so the Makefile target stays
+          # the one plan command. Main plans keep the lock.
+          TF_CLI_ARGS_plan: ${{ github.event_name == 'pull_request' && '-lock=false' || '' }}
+
+      # Not `-detailed-exitcode`: make collapses every failing recipe to exit
+      # status 2, so "changes present" and "plan failed" would look the same.
+      # `applyable` is false exactly when the plan has nothing to do.
+      - name: Detect changes
+        id: changes
+        if: github.event_name != 'pull_request'
+        # Fails closed: anything but true/false (an error, a missing field in a
+        # future plan format) stops the run rather than reading as "no changes",
+        # which would skip apply and release onto unconverged infrastructure.
+        run: |
+          changes=$(terraform -chdir=infra/envs/website show -json website.tfplan \
+            | jq 'if (.applyable | type) == "boolean" then .applyable else error("plan JSON has no boolean applyable") end')
+          echo "changes=${changes}" >> "$GITHUB_OUTPUT"
+          echo "Plan has changes: ${changes}"
+
+      # The bucket, not a workflow artifact: artifacts on a public repository
+      # can be downloaded by any signed-in GitHub user.
+      - name: Store plan
+        if: steps.changes.outputs.changes == 'true'
+        run: aws s3 cp --no-progress "$PLAN_FILE" "s3://${STATE_BUCKET}/${PLAN_KEY}"
+
+  # Applies exactly the stored plan file, never a fresh plan. Skipped when the
+  # plan is empty, so a content-only push asks for no approval.
+  apply:
+    needs: plan
+    if: github.event_name != 'pull_request' && needs.plan.outputs.changes == 'true'
+    runs-on: ubuntu-24.04
+    environment: website-terraform
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          install_args: terraform
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_CI_APPLY }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+      - run: make tf-init ENV=website
+      - name: Fetch plan
+        run: aws s3 cp --no-progress "s3://${STATE_BUCKET}/${PLAN_KEY}" "$PLAN_FILE"
+      - name: Apply
+        run: make tf-apply ENV=website
+        env:
+          # The writing DNS role. `dns_role_arn` is ephemeral, so the plan file
+          # doesn't pin the read role the plan job used.
+          TF_VAR_dns_role_arn: ${{ secrets.DNS_ROLE_WRITE }}
+
+  # Builds with the root's own SITE_URL and syncs it. Runs after a successful
+  # apply or a skipped one (no changes), never after a rejected or failed one:
+  # a release must not publish onto infrastructure that didn't converge.
+  # `!cancelled()` is needed because a skipped dependency would otherwise
+  # skip this job too.
+  release:
+    needs: [plan, apply]
+    if: >-
+      !cancelled()
+      && github.event_name != 'pull_request'
+      && needs.plan.result == 'success'
+      && (needs.apply.result == 'success' || needs.apply.result == 'skipped')
+    runs-on: ubuntu-24.04
+    environment: website-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          install_args: node terraform
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_CI_RELEASE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+      - run: npm --prefix frontend ci
+      # Only for `terraform output`: SITE_URL, bucket, distribution.
+      - run: make tf-init ENV=website
+      - run: make release ENV=website
