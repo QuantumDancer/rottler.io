@@ -26,8 +26,8 @@
 # policy can't name a role that doesn't exist yet): `ci-plan` to
 # `website-dns-read`, `ci-apply` to `website-dns`.
 #
-# TODO: trim the read set (both roles together) to what a real plan of the
-# website root calls.
+# The read set (both roles together) is what the website root's plans and
+# applies call against provider 6.x, checked against the provider source.
 
 locals {
   website_sso_admin_arn_pattern = "arn:aws:iam::${var.website_account_id}:role/aws-reserved/sso.amazonaws.com/*AWSReservedSSO_AdministratorAccess_*"
@@ -35,23 +35,28 @@ locals {
   # Shared by both roles so they can't drift apart.
   website_dns_read_statements = [
     {
+      # `data "aws_route53_zone"` reads the zone's details and tags once it
+      # has found it, and the record resources read their record sets.
       Sid      = "ReadZone"
       Effect   = "Allow"
       Action   = ["route53:GetHostedZone", "route53:ListResourceRecordSets", "route53:ListTagsForResource"]
       Resource = "arn:aws:route53:::hostedzone/*"
     },
     {
+      # Polled after every record change until it reports INSYNC.
       Sid      = "ReadChange"
       Effect   = "Allow"
       Action   = "route53:GetChange"
       Resource = "arn:aws:route53:::change/*"
     },
     {
-      # The website root finds the zone by name (`data "aws_route53_zone"`),
-      # so no zone ID is ever committed. This action has no resource scope.
+      # The website root finds the zone by name, so no zone ID is ever
+      # committed. Provider 6.x's `data "aws_route53_zone"` does that by
+      # paging `ListHostedZones`, not `ListHostedZonesByName`. The action
+      # has no resource scope.
       Sid      = "FindZoneByName"
       Effect   = "Allow"
-      Action   = "route53:ListHostedZonesByName"
+      Action   = "route53:ListHostedZones"
       Resource = "*"
     },
   ]
