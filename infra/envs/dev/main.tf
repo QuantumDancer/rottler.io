@@ -105,3 +105,10 @@ locals {
   # into the existing bucket's name, and a change means a new bucket.
   project_name = "rottler-io"
 }
+
+# static-site now writes one A (and one AAAA) record per alias, keyed by name.
+# dev's single alias is its domain, so its existing A record is that entry.
+moved {
+  from = module.site.aws_route53_record.website
+  to   = module.site.aws_route53_record.website_a["dev.rottler.io"]
+}

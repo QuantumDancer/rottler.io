@@ -16,7 +16,7 @@ variable "project_name" {
 # Passing it explicitly keeps environment names out of the module, which is what
 # lets `envs/prod` later reuse it with the apex and www names.
 variable "aliases" {
-  description = "CNAMEs served by the distribution. Every entry must be covered by the certificate."
+  description = "CNAMEs served by the distribution, each also given A and AAAA alias records in `zone_id`. Every entry must be covered by the certificate. Empty means no aliases and no records."
   type        = list(string)
   nullable    = false
 }
@@ -28,7 +28,7 @@ variable "acm_certificate_arn" {
 }
 
 variable "zone_id" {
-  description = "Hosted zone the alias A record is written into"
+  description = "Hosted zone the alias records are written into, through the `aws.dns` provider"
   type        = string
   nullable    = false
 }
