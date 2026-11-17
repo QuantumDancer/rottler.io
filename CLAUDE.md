@@ -36,6 +36,10 @@ the commands below, so passing them locally predicts a green run.
 - New Terraform root: add it to the `infra` job's `env` matrix in `ci.yml`,
   and its `infra (<env>)` check to the `main` ruleset's required checks.
 
+Deploy CI (`.github/workflows/deploy.yml`) also runs a read-only
+`envs/website` plan on every PR. It isn't a required check. Read its log for
+the plan.
+
 ## Git workflow
 
 `main` is protected by a repository ruleset: changes land through a PR with
@@ -54,6 +58,14 @@ All AWS work runs through the root `Makefile`, scoped to one environment via
 - `make release` builds with the environment's own `SITE_URL` (from Terraform
   output) and deploys via `scripts/deploy.sh`, whose preflight guards the
   `aws s3 sync --delete`.
+- `envs/website` deploys from CI, not locally: every push to `main` runs
+  `deploy.yml`. `plan` stores the plan file under `plans/` in the state
+  bucket. `apply` applies that file behind the `website-terraform` GitHub
+  environment (Benjamin approves) and is skipped when nothing changes.
+  `release` then runs `make release ENV=website`. Each job assumes its own
+  role from `website-bootstrap`; the role ARNs are GitHub secrets, never
+  variables. Bootstrap roots stay local-only, as do `envs/dev` and
+  `envs/shared-services`.
 - Each root's `.terraform.lock.hcl` is the provider pin; run `terraform init`
   without `-upgrade`. Renovate proposes provider and lockfile bumps as PRs; a
   bump to a new major lands only with a no-changes plan before it and a plan
