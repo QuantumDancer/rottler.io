@@ -21,10 +21,9 @@
 # account holds only the rottler.io zone, and the record-name conditions below
 # do the narrowing that a zone ARN would otherwise do.
 #
-# Trust today is the website account's SSO AdministratorAccess role only, for
-# local applies. Deploy CI appends its own roles when it creates them (a trust
-# policy can't name a role that doesn't exist yet): `ci-plan` to
-# `website-dns-read`, `ci-apply` to `website-dns`.
+# Each role trusts the website account's SSO AdministratorAccess role, for
+# local plans and applies, plus one deploy CI role from `website-bootstrap`:
+# `ci-plan` may become only `website-dns-read`, `ci-apply` only `website-dns`.
 #
 # The read set (both roles together) is what the website root's plans and
 # applies call against provider 6.x, checked against the provider source.
@@ -62,12 +61,21 @@ locals {
   ]
 }
 
-# Principal is the whole website account, narrowed to the SSO admin role by
-# `aws:PrincipalArn`. Naming the SSO role's ARN as the principal directly would
-# break whenever Identity Center reprovisions it under a new suffix. No
-# external ID (there is no third party) and no source identity (the
+# Principal is the whole website account, narrowed to the SSO admin role and
+# the role's one CI role by `aws:PrincipalArn`. Naming the SSO role's ARN as
+# the principal directly would break whenever Identity Center reprovisions it
+# under a new suffix. Naming the CI role there would break if it were ever
+# recreated: IAM stores a named role principal as the role's unique ID.
+# No external ID (there is no third party) and no source identity (the
 # CloudTrail session name already says who).
+#
+# Keyed by this account's role name. The value is the CI role allowed in.
 data "aws_iam_policy_document" "website_dns_trust" {
+  for_each = {
+    website-dns-read = "ci-plan"
+    website-dns      = "ci-apply"
+  }
+
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -79,7 +87,10 @@ data "aws_iam_policy_document" "website_dns_trust" {
     condition {
       test     = "ArnLike"
       variable = "aws:PrincipalArn"
-      values   = [local.website_sso_admin_arn_pattern]
+      values = [
+        local.website_sso_admin_arn_pattern,
+        "arn:aws:iam::${var.website_account_id}:role/${each.value}",
+      ]
     }
   }
 }
@@ -91,7 +102,7 @@ data "aws_iam_policy_document" "website_dns_trust" {
 resource "aws_iam_role" "website_dns_read" {
   name               = "website-dns-read"
   description        = "Read-only access to the rottler.io zone for website root plans"
-  assume_role_policy = data.aws_iam_policy_document.website_dns_trust.json
+  assume_role_policy = data.aws_iam_policy_document.website_dns_trust["website-dns-read"].json
 }
 
 resource "aws_iam_role_policy" "website_dns_read" {
@@ -111,7 +122,7 @@ resource "aws_iam_role_policy" "website_dns_read" {
 resource "aws_iam_role" "website_dns" {
   name               = "website-dns"
   description        = "Writes the website root's apex/www aliases and ACM validation records into the rottler.io zone"
-  assume_role_policy = data.aws_iam_policy_document.website_dns_trust.json
+  assume_role_policy = data.aws_iam_policy_document.website_dns_trust["website-dns"].json
 }
 
 # Two write statements, each pairing names with types. Terraform's Route 53

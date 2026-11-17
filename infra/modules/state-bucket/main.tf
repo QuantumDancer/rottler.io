@@ -134,6 +134,29 @@ resource "aws_s3_bucket_lifecycle_configuration" "state" {
     }
   }
 
+  # Deploy CI hands its saved plan from the plan job to the apply job through
+  # `plans/<run_id>.tfplan` here rather than as a workflow artifact, which any
+  # signed-in user can download from a public repository. A plan file is only
+  # useful for the run that made it, so a week covers a slow approval with room
+  # to spare. Overlaps the rule above; S3 honours the shorter expiry, so expired
+  # plans lose their noncurrent version after a day instead of ninety.
+  rule {
+    id     = "expire-ci-plans"
+    status = "Enabled"
+
+    filter {
+      prefix = "plans/"
+    }
+
+    expiration {
+      days = 7
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+  }
+
   # Lifecycle rules on a versioned bucket need versioning in place first.
   depends_on = [aws_s3_bucket_versioning.state]
 }
