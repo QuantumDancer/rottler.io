@@ -21,7 +21,13 @@
 # masked in logs, and an ARN names the account.
 
 locals {
-  github_repository = "QuantumDancer/rottler.io"
+  # The repository uses GitHub's immutable OIDC subject, which carries the
+  # owner's and the repository's numeric IDs next to their names
+  # (`GET /repos/{owner}/{repo}/actions/oidc/customization/sub` shows the
+  # prefix). It survives a rename, and a deleted-and-recreated repository of
+  # the same name gets a new ID, so it can't inherit this trust. Both IDs are
+  # public.
+  github_subject_prefix = "repo:QuantumDancer@3868732/rottler.io@1457022000"
 
   state_bucket_arn = module.state_bucket.bucket_arn
   main_state_arn   = "${local.state_bucket_arn}/main/terraform.tfstate"
@@ -37,11 +43,11 @@ locals {
   # rules (reviewer, `main`-only deployment branches).
   ci_role_subjects = {
     ci-plan = [
-      "repo:${local.github_repository}:ref:refs/heads/main",
-      "repo:${local.github_repository}:pull_request",
+      "${local.github_subject_prefix}:ref:refs/heads/main",
+      "${local.github_subject_prefix}:pull_request",
     ]
-    ci-apply   = ["repo:${local.github_repository}:environment:website-terraform"]
-    ci-release = ["repo:${local.github_repository}:environment:website-release"]
+    ci-apply   = ["${local.github_subject_prefix}:environment:website-terraform"]
+    ci-release = ["${local.github_subject_prefix}:environment:website-release"]
   }
 }
 
