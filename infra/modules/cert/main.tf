@@ -51,9 +51,15 @@ resource "aws_route53_record" "acm_validation" {
   zone_id         = var.zone_id
 }
 
-# Intentionally omitted: `aws_acm_certificate_validation`. The legacy stack never
-# had one, and introducing it here would be a resource *add* inside a migration
-# whose entire safety gate is "0 add, 0 replace". ACM validates from the records
-# above regardless; that resource exists only to make Terraform *block* until
-# validation completes. Worth adding in a later commit if a first-apply race
-# between certificate issuance and the distribution ever actually bites.
+# Blocks the apply until ACM has issued the certificate. CloudFront refuses to
+# attach a certificate that isn't issued yet, so without this wait a root that
+# creates its cert and distribution in one apply fails on the distribution.
+# Exporting the ARN from here, not from the certificate, is what orders the
+# distribution after issuance.
+#
+# No AWS object behind it: creating it only polls, and destroying it is a
+# no-op.
+resource "aws_acm_certificate_validation" "website_cert" {
+  certificate_arn         = aws_acm_certificate.website_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.acm_validation : record.fqdn]
+}
