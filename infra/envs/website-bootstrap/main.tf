@@ -57,8 +57,7 @@ module "state_bucket" {
 # CA library for this issuer, and the provider has accepted an empty list since
 # 5.81.
 #
-# TODO: the CI roles that trust this provider are added here by the deploy CI
-# ticket, which owns their scope and trust conditions.
+# The roles that trust it are in ci_roles.tf.
 resource "aws_iam_openid_connect_provider" "github_actions" {
   url            = "https://token.actions.githubusercontent.com"
   client_id_list = ["sts.amazonaws.com"]
